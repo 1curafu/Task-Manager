@@ -1,0 +1,70 @@
+.notes-panel {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: none;
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.notes-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.notes-save-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.notes-textarea {
+  width: 100%;
+  min-height: 200px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-family: inherit;
+  line-height: 1.6;
+  background: var(--background);
+  color: var(--text-primary);
+  resize: vertical;
+  transition: all 0.2s ease;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+}
+
+.notes-textarea-error {
+  border-color: var(--danger-color) !important;
+}
+
+.notes-error-text {
+  color: var(--danger-color);
+  font-size: 14px;
+  margin-top: 8px;
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .notes-panel {
+    margin-top: 24px;
+  }
+  
+  .notes-textarea {
+    min-height: 150px;
+  }
+}
