@@ -65,8 +65,7 @@ export const loginSchema = z.object({
       return emailRegex.test(email)
     }, 'Please enter a valid email address'),
   password: z.string()
-    .min(6, 'Password must be at least 6 characters')
-    .max(100, 'Password must be less than 100 characters'),
+    .min(1, 'Password is required'),
 })
 
 export type LoginFormData = z.infer<typeof loginSchema>
