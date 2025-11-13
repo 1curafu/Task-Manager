@@ -4,24 +4,31 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabaseClient'
 import { isToday, isTomorrow } from 'date-fns'
+import Image from 'next/image'
 import Clock from '@/components/Clock'
 import NotesPanel from '@/components/NotesPanel'
+import InboxPanel from '@/components/InboxPanel'
+import TeamsPanel from '@/components/TeamsPanel'
 import TaskCard from '@/components/TaskCard'
 import TaskList from '@/components/TaskList'
 import CalendarView from '@/components/CalendarView'
+import ConfirmModal from '@/components/ConfirmModal'
 import './dashboard.css'
 
 interface Task {
   id: string
   name: string
   dueDate: string
-  responsible?: string | null
   category?: string | null
   notes?: string | null
   links?: string | null
   userId: string
   lastUpdated: string
   createdAt: string
+  teamId?: string | null
+  assignedToId?: string | null
+  createdById?: string | null
+  completed?: boolean
 }
 
 export default function DashboardPage() {
@@ -31,6 +38,14 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true)
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false)
+  const [showInbox, setShowInbox] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
+  const [showTaskDetails, setShowTaskDetails] = useState(false)
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  
   const router = useRouter()
   const supabase = createClient()
 
@@ -39,13 +54,28 @@ export default function DashboardPage() {
       const { data, error } = await supabase
         .from('Task')
         .select('*')
-        .eq('userId', userId)
+        .or(`userId.eq.${userId},assignedToId.eq.${userId}`)
         .order('dueDate', { ascending: true })
 
       if (error) throw error
       setTasks(data || [])
     } catch (err) {
       console.error('Error loading tasks:', err)
+    }
+  }
+
+  const loadUnreadCount = async () => {
+    try {
+      const { count, error } = await supabase
+        .from('Notification')
+        .select('*', { count: 'exact', head: true })
+        .eq('userId', userId)
+        .eq('isRead', false)
+
+      if (error) throw error
+      setUnreadCount(count || 0)
+    } catch (err) {
+      console.error('Error loading unread count:', err)
     }
   }
 
@@ -64,13 +94,103 @@ export default function DashboardPage() {
     }
 
     checkAuth()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (userId) {
       loadTasks()
+      loadUnreadCount()
+      checkPendingInvites()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
+
+  const checkPendingInvites = async () => {
+    if (!userId || !userEmail) {
+      console.log('checkPendingInvites: No userId or userEmail', { userId, userEmail })
+      return
+    }
+
+    console.log('Checking pending invites for:', userEmail)
+
+    try {
+      const { data: pendingInvites, error } = await supabase
+        .from('TeamMember')
+        .select('id, teamId, role')
+        .eq('userEmail', userEmail)
+        .eq('status', 'pending')
+
+      console.log('Pending invites query result:', { pendingInvites, error })
+
+      if (error) {
+        console.error('Error fetching pending invites:', error)
+        return
+      }
+
+      if (pendingInvites && pendingInvites.length > 0) {
+        console.log(`Found ${pendingInvites.length} pending invite(s)`)
+        
+        for (const invite of pendingInvites) {
+          const { data: existingNotif } = await supabase
+            .from('Notification')
+            .select('id')
+            .eq('userId', userId)
+            .eq('type', 'team_invite')
+            .eq('link', `/dashboard?acceptInvite=${invite.id}`)
+            .maybeSingle()
+
+          console.log('Existing notification check:', { existingNotif, inviteId: invite.id })
+
+          if (!existingNotif) {
+            const { data: team } = await supabase
+              .from('Team')
+              .select('name')
+              .eq('id', invite.teamId)
+              .maybeSingle()
+
+            const teamName = team?.name || 'a team'
+            
+            console.log('Creating notification for team:', teamName)
+              
+            const { data: newNotif, error: notifError } = await supabase
+              .from('Notification')
+              .insert({
+                userId: userId,
+                type: 'team_invite',
+                title: 'Team Invitation',
+                message: `You've been invited to join ${teamName} as ${invite.role}. Click to accept or decline.`,
+                link: `/dashboard?acceptInvite=${invite.id}`,
+              })
+              .select()
+
+            console.log('Notification creation result:', { newNotif, notifError })
+          }
+        }
+        
+        console.log('Reloading notification count...')
+        await loadUnreadCount()
+      } else {
+        console.log('No pending invites found')
+      }
+    } catch (err) {
+      console.error('Error checking pending invites:', err)
+    }
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement
+      if (!target.closest('.profile-menu')) {
+        setShowProfileDropdown(false)
+      }
+    }
+
+    if (showProfileDropdown) {
+      document.addEventListener('click', handleClickOutside)
+      return () => document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showProfileDropdown])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -78,21 +198,72 @@ export default function DashboardPage() {
     router.push('/auth/login')
   }
 
+  const getUserInitials = (email: string) => {
+    if (!email) return '?'
+    const name = email.split('@')[0]
+    return name.charAt(0).toUpperCase()
+  }
+
   const handleDeleteTask = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this task?')) return
+    const task = tasks.find(t => t.id === id)
+    if (!task) return
+
+    const canDelete = task.createdById === userId || (task.userId === userId && !task.createdById)
+    
+    if (!canDelete) {
+      alert('You can only delete tasks you created. Tasks assigned by team owner/admin cannot be deleted.')
+      return
+    }
+
+    setTaskToDelete(id)
+    setShowConfirmModal(true)
+  }
+
+  const confirmDeleteTask = async () => {
+    if (!taskToDelete) return
+    
+    setShowConfirmModal(false)
 
     try {
       const { error } = await supabase
         .from('Task')
         .delete()
-        .eq('id', id)
+        .eq('id', taskToDelete)
 
       if (error) throw error
       await loadTasks()
     } catch (err) {
       console.error('Error deleting task:', err)
       alert('Failed to delete task')
+    } finally {
+      setTaskToDelete(null)
     }
+  }
+
+  const handleToggleTaskCompletion = async (taskId: string, currentStatus: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('Task')
+        .update({ 
+          completed: !currentStatus,
+          lastUpdated: new Date().toISOString()
+        })
+        .eq('id', taskId)
+
+      if (error) {
+        console.error('Error updating task status:', error)
+        throw error
+      }
+      await loadTasks()
+    } catch (err) {
+      console.error('Error updating task:', err)
+      alert('Failed to update task status')
+    }
+  }
+
+  const handleShowTaskDetails = (task: Task) => {
+    setSelectedTask(task)
+    setShowTaskDetails(true)
   }
 
   const todayTasks = tasks.filter(task => isToday(new Date(task.dueDate)))
@@ -108,6 +279,62 @@ export default function DashboardPage() {
 
   return (
     <>
+      <nav className="top-navbar">
+        <div className="navbar-branding">
+          <Image src="/vela_updated.png" alt="Vela" width={36} height={36} className="navbar-logo" />
+          <h1 className="navbar-title">Vela</h1>
+        </div>
+        <div className="navbar-menu">
+          <button 
+            className="inbox-button"
+            onClick={() => setShowInbox(true)}
+            aria-label="Inbox"
+          >
+            <svg className="inbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            {unreadCount > 0 && (
+              <span className="inbox-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+            )}
+          </button>
+          <div className="profile-menu">
+            <button 
+              className="avatar-button"
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              aria-label="User menu"
+            >
+              <div className="avatar">
+                {getUserInitials(userEmail)}
+              </div>
+            </button>
+            
+            {showProfileDropdown && (
+              <div className="profile-dropdown">
+                <div className="dropdown-header">
+                  <div className="dropdown-avatar">
+                    {getUserInitials(userEmail)}
+                  </div>
+                  <div className="dropdown-user-info">
+                    <span className="dropdown-email">{userEmail}</span>
+                  </div>
+                </div>
+                <div className="dropdown-divider"></div>
+                <button className="dropdown-item">
+                  <span>Profile</span>
+                </button>
+                <button className="dropdown-item">
+                  <span>Settings</span>
+                </button>
+                <div className="dropdown-divider"></div>
+                <button className="dropdown-item logout-item" onClick={handleLogout}>
+                  <span>Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
+
       <div className="dashboard">
         <aside className="sidebar">
           <Clock />
@@ -116,13 +343,7 @@ export default function DashboardPage() {
 
         <main className="main-content">
           <div className="dashboard-header">
-            <h1 className="dashboard-title">Task Manager</h1>
-            <div className="user-menu">
-              <span className="user-email">{userEmail}</span>
-              <button onClick={handleLogout} className="btn btn-secondary btn-small">
-                Logout
-              </button>
-            </div>
+            <TeamsPanel userId={userId} userEmail={userEmail} />
           </div>
 
           <div className="task-cards-grid">
@@ -146,11 +367,8 @@ export default function DashboardPage() {
 
           <TaskList
             tasks={tasks}
-            onEdit={(task) => {
-              setEditingTask(task)
-              setShowTaskModal(true)
-            }}
-            onDelete={handleDeleteTask}
+            onToggleComplete={handleToggleTaskCompletion}
+            onShowDetails={handleShowTaskDetails}
           />
 
           <CalendarView tasks={tasks} />
@@ -172,6 +390,49 @@ export default function DashboardPage() {
           }}
         />
       )}
+
+      {showInbox && (
+        <InboxPanel 
+          userId={userId}
+          onClose={() => {
+            setShowInbox(false)
+            loadUnreadCount()
+          }}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete"
+        isDanger={true}
+        onConfirm={confirmDeleteTask}
+        onCancel={() => {
+          setShowConfirmModal(false)
+          setTaskToDelete(null)
+        }}
+      />
+
+      {showTaskDetails && selectedTask && (
+        <TaskDetailsModal
+          task={selectedTask}
+          userId={userId}
+          onClose={() => {
+            setShowTaskDetails(false)
+            setSelectedTask(null)
+          }}
+          onEdit={() => {
+            setEditingTask(selectedTask)
+            setShowTaskModal(true)
+            setShowTaskDetails(false)
+          }}
+          onDelete={() => {
+            setShowTaskDetails(false)
+            handleDeleteTask(selectedTask.id)
+          }}
+        />
+      )}
     </>
   )
 }
@@ -185,16 +446,93 @@ function TaskModal({ task, userId, onClose, onSave }: {
   const [formData, setFormData] = useState({
     name: task?.name || '',
     dueDate: task?.dueDate?.split('T')[0] || new Date().toISOString().split('T')[0],
-    responsible: task?.responsible || '',
     category: task?.category || '',
     notes: task?.notes || '',
     links: task?.links || '',
+    teamId: task?.teamId || '',
+    assignedToId: task?.assignedToId || '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+  const [teams, setTeams] = useState<Array<{ id: string; name: string; role: string }>>([])
+  const [teamMembers, setTeamMembers] = useState<Array<{ userId: string; userEmail: string }>>([])
   const debounceTimers = useRef<Record<string, NodeJS.Timeout>>({})
   const supabase = createClient()
+
+  useEffect(() => {
+    const loadTeams = async () => {
+      try {
+        const { data: ownedTeams, error: ownedError } = await supabase
+          .from('Team')
+          .select('id, name')
+          .eq('ownerId', userId)
+
+        if (ownedError) throw ownedError
+
+        const { data: memberTeams, error: memberError } = await supabase
+          .from('TeamMember')
+          .select('teamId, role')
+          .eq('userId', userId)
+          .in('role', ['owner', 'admin'])
+          .eq('status', 'accepted')
+
+        if (memberError) throw memberError
+
+        const teamIds = memberTeams?.map(m => m.teamId) || []
+        const { data: memberTeamDetails, error: detailsError } = await supabase
+          .from('Team')
+          .select('id, name')
+          .in('id', teamIds)
+
+        if (detailsError) throw detailsError
+
+        const allTeams = [
+          ...(ownedTeams || []).map(t => ({ ...t, role: 'owner' })),
+          ...(memberTeamDetails || []).map(t => ({
+            ...t,
+            role: memberTeams?.find(m => m.teamId === t.id)?.role || 'admin'
+          }))
+        ]
+
+        const uniqueTeams = allTeams.filter((team, index, self) =>
+          index === self.findIndex(t => t.id === team.id)
+        )
+
+        setTeams(uniqueTeams)
+      } catch (err) {
+        console.error('Error loading teams:', err)
+      }
+    }
+
+    loadTeams()
+  }, [userId, supabase])
+
+  useEffect(() => {
+    const loadTeamMembers = async () => {
+      if (!formData.teamId) {
+        setTeamMembers([])
+        return
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('TeamMember')
+          .select('userId, userEmail')
+          .eq('teamId', formData.teamId)
+          .eq('status', 'accepted')
+          .not('userId', 'is', null)
+
+        if (error) throw error
+        setTeamMembers(data || [])
+      } catch (err) {
+        console.error('Error loading team members:', err)
+        setTeamMembers([])
+      }
+    }
+
+    loadTeamMembers()
+  }, [formData.teamId, supabase])
 
   useEffect(() => {
     const timers = debounceTimers.current
@@ -227,6 +565,10 @@ function TaskModal({ task, userId, onClose, onSave }: {
   const handleFieldChange = (fieldName: string, value: string) => {
     setFormData({ ...formData, [fieldName]: value })
     
+    if (fieldName === 'teamId' && !value) {
+      setFormData({ ...formData, teamId: '', assignedToId: '' })
+    }
+    
     if (touched[fieldName]) {
       if (debounceTimers.current[fieldName]) {
         clearTimeout(debounceTimers.current[fieldName])
@@ -250,14 +592,24 @@ function TaskModal({ task, userId, onClose, onSave }: {
 
     try {
       const { taskSchema } = await import('@/lib/validations')
-      const validatedData = taskSchema.parse(formData)
+      const validatedData = taskSchema.parse({
+        name: formData.name,
+        dueDate: formData.dueDate,
+        responsible: '',
+        category: formData.category,
+        notes: formData.notes,
+        links: formData.links,
+      })
 
       const now = new Date().toISOString()
       const taskData = {
         ...validatedData,
         dueDate: new Date(validatedData.dueDate).toISOString(),
-        userId,
+        userId: formData.assignedToId || userId,
         lastUpdated: now,
+        teamId: formData.teamId || null,
+        assignedToId: formData.assignedToId || null,
+        createdById: task?.createdById || userId,
       }
 
       if (task) {
@@ -358,26 +710,47 @@ function TaskModal({ task, userId, onClose, onSave }: {
             )}
           </div>
 
-          <div className="form-group">
-            <label className="form-label" htmlFor="task-responsible">Responsible Person</label>
-            <input
-              id="task-responsible"
-              type="text"
-              className={`form-input ${errors.responsible ? 'form-input-error' : ''}`}
-              value={formData.responsible}
-              onChange={(e) => handleFieldChange('responsible', e.target.value)}
-              onBlur={() => handleFieldBlur('responsible')}
-              placeholder="Person's name"
-              aria-label="Responsible person"
-              aria-invalid={!!errors.responsible}
-              aria-describedby={errors.responsible ? 'responsible-error' : undefined}
-            />
-            {errors.responsible && (
-              <span id="responsible-error" className="form-error-text" role="alert">
-                {errors.responsible}
-              </span>
-            )}
-          </div>
+          {teams.length > 0 && (
+            <>
+              <div className="form-group">
+                <label className="form-label" htmlFor="task-team">Assign to Team (Optional)</label>
+                <select
+                  id="task-team"
+                  className="form-input"
+                  value={formData.teamId}
+                  onChange={(e) => handleFieldChange('teamId', e.target.value)}
+                  aria-label="Select team"
+                >
+                  <option value="">Personal Task</option>
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name} ({team.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {formData.teamId && teamMembers.length > 0 && (
+                <div className="form-group">
+                  <label className="form-label" htmlFor="task-assignee">Assign to Member</label>
+                  <select
+                    id="task-assignee"
+                    className="form-input"
+                    value={formData.assignedToId}
+                    onChange={(e) => setFormData({ ...formData, assignedToId: e.target.value })}
+                    aria-label="Assign to team member"
+                  >
+                    <option value="">Select member...</option>
+                    {teamMembers.map((member) => (
+                      <option key={member.userId} value={member.userId}>
+                        {member.userEmail}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </>
+          )}
 
           <div className="form-group">
             <label className="form-label" htmlFor="task-category">Category</label>
@@ -464,6 +837,140 @@ function TaskModal({ task, userId, onClose, onSave }: {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  )
+}
+
+function TaskDetailsModal({ task, userId, onClose, onEdit, onDelete }: {
+  task: Task
+  userId: string
+  onClose: () => void
+  onEdit: () => void
+  onDelete: () => void
+}) {
+  const canDeleteTask = (task: Task) => {
+    if (task.createdById === userId) return true
+    if (task.userId === userId && !task.createdById) return true
+    return false
+  }
+
+  return (
+    <div className="auth-overlay" onClick={onClose}>
+      <div className="task-details-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h2 className="modal-title">Task Details</h2>
+          <button onClick={onClose} className="modal-close-btn">✕</button>
+        </div>
+
+        <div className="task-details-content">
+          <div className="task-detail-section">
+            <label className="task-detail-label">Task Name</label>
+            <p className="task-detail-value">{task.name}</p>
+          </div>
+
+          <div className="task-detail-row">
+            <div className="task-detail-section">
+              <label className="task-detail-label">Due Date</label>
+              <p className="task-detail-value">
+                {new Date(task.dueDate).toLocaleDateString('en-US', { 
+                  month: 'long', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })}
+              </p>
+            </div>
+
+            <div className="task-detail-section">
+              <label className="task-detail-label">Status</label>
+              <p className="task-detail-value">
+                <span className={`status-badge ${task.completed ? 'status-completed' : 'status-pending'}`}>
+                  {task.completed ? '✓ Completed' : '○ Pending'}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          {task.category && (
+            <div className="task-detail-section">
+              <label className="task-detail-label">Category</label>
+              <p className="task-detail-value">
+                <span className="category-badge">{task.category}</span>
+              </p>
+            </div>
+          )}
+
+          {task.notes && (
+            <div className="task-detail-section">
+              <label className="task-detail-label">Notes</label>
+              <p className="task-detail-value task-detail-notes">{task.notes}</p>
+            </div>
+          )}
+
+          {task.links && (
+            <div className="task-detail-section">
+              <label className="task-detail-label">Links</label>
+              <p className="task-detail-value task-detail-links">
+                {task.links.split(',').map((link, index) => (
+                  <span key={index}>
+                    <a href={link.trim()} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary-color)', textDecoration: 'underline' }}>
+                      {link.trim()}
+                    </a>
+                    {index < task.links!.split(',').length - 1 && <br />}
+                  </span>
+                ))}
+              </p>
+            </div>
+          )}
+
+          {task.teamId && (
+            <div className="task-detail-section">
+              <label className="task-detail-label">Team Assignment</label>
+              <p className="task-detail-value">
+                <span className="category-badge">Team Task</span>
+              </p>
+            </div>
+          )}
+
+          <div className="task-detail-row">
+            <div className="task-detail-section">
+              <label className="task-detail-label">Created</label>
+              <p className="task-detail-value task-detail-date">
+                {new Date(task.createdAt).toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+
+            <div className="task-detail-section">
+              <label className="task-detail-label">Last Updated</label>
+              <p className="task-detail-value task-detail-date">
+                {new Date(task.lastUpdated).toLocaleString('en-US', {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-actions task-details-actions">
+          <button onClick={onEdit} className="btn btn-primary">
+            Edit Task
+          </button>
+          {canDeleteTask(task) && (
+            <button onClick={onDelete} className="btn btn-danger">
+              Delete Task
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
