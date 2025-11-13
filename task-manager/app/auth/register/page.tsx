@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabaseClient'
+import { checkPasswordLeak } from '@/lib/passwordSecurity'
 import Link from 'next/link'
+import Image from 'next/image'
 import '../auth.css'
 
 export default function RegisterPage() {
@@ -129,11 +131,6 @@ export default function RegisterPage() {
       { correct: 'outlook.com', variations: ['outlok', 'outloook', 'outluk'] },
       { correct: 'icloud.com', variations: ['iclod', 'iclooud', 'iclud', 'icoud'] },
       { correct: 'protonmail.com', variations: ['protonmal', 'protonmial'] },
-      { correct: 'aol.com', variations: ['ao'] },
-      { correct: 'live.com', variations: ['liv'] },
-      { correct: 'msn.com', variations: [''] },
-      { correct: 'me.com', variations: [''] },
-      { correct: 'mac.com', variations: [''] },
     ]
     
     const domainLower = domain.toLowerCase()
@@ -274,6 +271,14 @@ export default function RegisterPage() {
       const { registerSchema } = await import('@/lib/validations')
       const validatedData = registerSchema.parse({ email, password, confirmPassword })
 
+      // Check if password has been leaked in data breaches
+      const isLeaked = await checkPasswordLeak(validatedData.password)
+      if (isLeaked) {
+        setError('This password has been exposed in a data breach. Please choose a different password.')
+        setLoading(false)
+        return
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: validatedData.email,
         password: validatedData.password,
@@ -311,9 +316,13 @@ export default function RegisterPage() {
   return (
     <div className="auth-overlay">
       <div className="auth-modal">
+        <div className="auth-logo-container">
+          <Image src="/vela_updated.png" alt="Vela" width={120} height={120} className="auth-logo" priority />
+        </div>
         <h1 className="auth-title">
-          Task Manager
+          Vela
         </h1>
+        <p className="auth-slogan">Set your sails</p>
         
         {!registrationSuccess ? (
           <>
@@ -476,7 +485,7 @@ export default function RegisterPage() {
               <h3 className="instructions-title">Next Steps:</h3>
               <ol className="instructions-list">
                 <li>Open your email inbox</li>
-                <li>Look for an email from Task Manager</li>
+                <li>Look for an email from Vela</li>
                 <li>Click the confirmation link</li>
                 <li>Return here to log in</li>
               </ol>

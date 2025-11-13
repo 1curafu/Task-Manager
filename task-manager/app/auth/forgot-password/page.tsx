@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabaseClient'
 import Link from 'next/link'
+import Image from 'next/image'
 import '../auth.css'
 
 export default function ForgotPasswordPage() {
@@ -41,7 +42,11 @@ export default function ForgotPasswordPage() {
   return (
     <div className="auth-overlay">
       <div className="auth-modal">
-        <h1 className="auth-title">Task Manager</h1>
+        <div className="auth-logo-container">
+          <Image src="/vela_updated.png" alt="Vela" width={120} height={120} className="auth-logo" priority />
+        </div>
+        <h1 className="auth-title">Vela</h1>
+        <p className="auth-slogan">Set your sails</p>
 
         {!resetSent ? (
           <>
@@ -103,7 +108,7 @@ export default function ForgotPasswordPage() {
               <h3 className="instructions-title">Next Steps:</h3>
               <ol className="instructions-list">
                 <li>Open your email inbox</li>
-                <li>Look for an email from Task Manager</li>
+                <li>Look for an email from Vela</li>
                 <li>Click the reset password link</li>
                 <li>Create your new password</li>
               </ol>

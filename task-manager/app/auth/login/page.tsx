@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabaseClient'
 import Link from 'next/link'
+import Image from 'next/image'
 import '../auth.css'
 
 export default function LoginPage() {
@@ -111,9 +112,13 @@ export default function LoginPage() {
   return (
     <div className="auth-overlay">
       <div className="auth-modal">
+        <div className="auth-logo-container">
+          <Image src="/vela_updated.png" alt="Vela" width={120} height={120} className="auth-logo" priority />
+        </div>
         <h1 className="auth-title">
-          Task Manager
+          Vela
         </h1>
+        <p className="auth-slogan">Set your sails</p>
         <h2 className="auth-subtitle">
           Login
         </h2>
