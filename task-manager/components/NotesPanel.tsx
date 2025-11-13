@@ -140,7 +140,6 @@ function NotesModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const supabase = createClient()
 
-  // Auto-select note if initialNoteId is provided
   useEffect(() => {
     if (initialNoteId) {
       const note = notes.find(n => n.id === initialNoteId)
@@ -257,22 +256,18 @@ function NotesModal({
     })
   }
 
-  // Separate pinned and regular notes (for future pinning feature)
   const pinnedNotes = notes.filter(() => false) // TODO: Add pinned field
   const regularNotes = notes
 
   return (
     <div className="auth-overlay" onClick={onClose}>
       <div className="notes-modal" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className="notes-modal-header">
           <h2 className="modal-title">My Notes</h2>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
 
-        {/* Split View Body */}
         <div className="notes-modal-body">
-          {/* Left Sidebar - Notes List */}
           <div className="notes-sidebar">
             <div className="notes-sidebar-header">
               <button
@@ -339,7 +334,6 @@ function NotesModal({
             </div>
           </div>
 
-          {/* Right Content Area - Note Editor */}
           <div className="notes-content">
             {!selectedNote && !isEditing ? (
               <div className="notes-empty-editor">
@@ -395,7 +389,6 @@ function NotesModal({
           </div>
         </div>
 
-        {/* Delete Confirmation Modal */}
         {showDeleteConfirm && (
           <div className="confirm-overlay" onClick={() => setShowDeleteConfirm(false)}>
             <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>

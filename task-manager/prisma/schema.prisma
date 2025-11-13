@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Task {
-  id           String   @id @default(dbgenerated("uuid_generate_v4()::text"))
+  id           String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
   name         String
   dueDate      DateTime
   responsible  String?
@@ -19,17 +19,65 @@ model Task {
   userId       String
   lastUpdated  DateTime @default(now()) @updatedAt
   createdAt    DateTime @default(now())
+  teamId       String?
+  assignedToId String?
+  createdById  String?
+  completed    Boolean  @default(false)
 
   @@index([userId])
   @@index([dueDate])
+  @@index([assignedToId])
+  @@index([teamId])
 }
 
 model Note {
-  id        String   @id @default(dbgenerated("uuid_generate_v4()::text"))
+  id        String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
   content   String
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  userId    String
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
+}
+
+model Team {
+  id          String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
+
+  @@index([ownerId])
+}
+
+model TeamMember {
+  id          String    @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  teamId      String
+  userId      String?
+  userEmail   String
+  role        String    @default("member")
+  status      String    @default("pending")
+  invitedBy   String
+  invitedAt   DateTime  @default(now())
+  respondedAt DateTime?
+
+  @@unique([teamId, userId], map: "TeamMember_teamId_userId_unique")
+  @@index([teamId])
+  @@index([userId])
+  @@index([status])
 }

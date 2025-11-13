@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabaseClient'
+import { checkPasswordLeak } from '@/lib/passwordSecurity'
 import Link from 'next/link'
+import Image from 'next/image'
 import '../auth.css'
 
 export default function ResetPasswordPage() {
@@ -37,7 +39,6 @@ export default function ResetPasswordPage() {
     if (pwd.length >= 10) score += 1
     if (pwd.length >= 14) score += 1
 
-    // Character variety checks
     if (/[a-z]/.test(pwd)) score += 1
     if (/[A-Z]/.test(pwd)) score += 1
     if (/[0-9]/.test(pwd)) score += 1
@@ -73,11 +74,21 @@ export default function ResetPasswordPage() {
     try {
       if (password.length < 6) {
         setError('Password must be at least 6 characters')
+        setLoading(false)
         return
       }
 
       if (password !== confirmPassword) {
         setError('Passwords don\'t match')
+        setLoading(false)
+        return
+      }
+
+      // Check if password has been leaked in data breaches
+      const isLeaked = await checkPasswordLeak(password)
+      if (isLeaked) {
+        setError('This password has been exposed in a data breach. Please choose a different password.')
+        setLoading(false)
         return
       }
 
@@ -131,7 +142,11 @@ export default function ResetPasswordPage() {
   return (
     <div className="auth-overlay">
       <div className="auth-modal">
-        <h1 className="auth-title">Task Manager</h1>
+        <div className="auth-logo-container">
+          <Image src="/vela_updated.png" alt="Vela" width={120} height={120} className="auth-logo" priority />
+        </div>
+        <h1 className="auth-title">Vela</h1>
+        <p className="auth-slogan">Set your sails</p>
         <h2 className="auth-subtitle">Create New Password</h2>
 
         <form onSubmit={handleResetPassword}>

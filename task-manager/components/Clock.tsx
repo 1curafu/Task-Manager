@@ -27,7 +27,7 @@ export default function Clock() {
         hours: hours.toString().padStart(2, '0'),
         minutes: minutes.toString().padStart(2, '0'),
         period,
-        weekday: weekday.substring(0, 3) // Show first 3 letters
+        weekday: weekday.substring(0, 3)  // Short form of weekday
       })
     }
 
