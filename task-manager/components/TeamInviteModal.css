@@ -1,0 +1,162 @@
+.team-invite-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.team-invite-modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.team-invite-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.team-invite-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.team-invite-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  background: var(--background);
+  border-radius: var(--radius-sm);
+}
+
+.team-invite-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.team-invite-value {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.team-invite-role {
+  text-transform: capitalize;
+  color: var(--primary-color);
+}
+
+.team-invite-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.team-invite-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.team-invite-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.team-invite-decline {
+  background: rgba(142, 142, 147, 0.12);
+  color: var(--text-primary);
+}
+
+.team-invite-decline:hover:not(:disabled) {
+  background: rgba(142, 142, 147, 0.2);
+}
+
+.team-invite-accept {
+  background: var(--success-color);
+  color: white;
+}
+
+.team-invite-accept:hover:not(:disabled) {
+  background: #28c04d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3);
+}
+
+.team-invite-loading,
+.team-invite-error {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.team-invite-error {
+  color: var(--danger-color);
+}
+
+@media (max-width: 768px) {
+  .team-invite-modal {
+    padding: 24px;
+    max-width: 100%;
+    width: calc(100% - 32px);
+  }
+
+  .team-invite-title {
+    font-size: 20px;
+  }
+
+  .team-invite-actions {
+    flex-direction: column-reverse;
+  }
+
+  .team-invite-btn {
+    width: 100%;
+  }
+}
