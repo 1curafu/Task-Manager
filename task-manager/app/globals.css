@@ -86,8 +86,8 @@ h1, h2, h3, h4, h5, h6 {
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 40px;
-  min-height: 100vh;
-  padding: 48px 60px;
+  min-height: calc(100vh - 70px);
+  padding: 40px 60px;
   max-width: 1600px;
   margin: 0 auto;
 }
@@ -218,17 +218,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .category-badge-company {
   background: rgba(0, 113, 227, 0.08);
-  color: #0071e3;
+  color: #0051a8;
 }
 
 .category-badge-clients {
   background: rgba(52, 199, 89, 0.08);
-  color: #34c759;
+  color: #248a3d;
 }
 
 .category-badge-admin {
   background: rgba(255, 149, 0, 0.08);
-  color: #ff9500;
+  color: #bf6e00;
 }
 
 .table-container {
@@ -366,7 +366,7 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   font-size: 17px;
   font-weight: 500;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -374,6 +374,14 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
   position: relative;
   line-height: 1.4705882353;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn-primary {
@@ -385,11 +393,9 @@ h1, h2, h3, h4, h5, h6 {
 .btn-primary:hover {
   background: var(--primary-hover);
   box-shadow: 0 4px 20px rgba(0, 113, 227, 0.3);
-  transform: translateY(-1px);
 }
 
 .btn-primary:active {
-  transform: scale(0.98);
   box-shadow: 0 1px 8px rgba(0, 113, 227, 0.2);
 }
 
@@ -403,11 +409,10 @@ h1, h2, h3, h4, h5, h6 {
 .btn-secondary:hover {
   background: var(--background);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  transform: translateY(-1px);
 }
 
 .btn-secondary:active {
-  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .btn-small {
@@ -472,6 +477,48 @@ textarea.form-input {
   min-height: 120px;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
   line-height: 1.4705882353;
+}
+
+.input-error,
+.form-input-error {
+  border-color: var(--danger-color) !important;
+  animation: shake 0.3s;
+}
+
+.input-success,
+.form-input-success {
+  border-color: #34c759 !important;
+}
+
+.field-error,
+.form-error-text {
+  color: var(--danger-color);
+  font-size: 14px;
+  margin-top: 4px;
+  display: block;
+  animation: fadeIn 0.3s;
+}
+
+.input-wrapper,
+.dashboard-input-wrapper {
+  position: relative;
+}
+
+.input-with-icon {
+  padding-right: 40px;
+}
+
+.success-icon,
+.dashboard-success-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #34c759;
+  font-size: 20px;
+  font-weight: bold;
+  animation: scaleIn 0.3s ease;
+  pointer-events: none;
 }
 
 .auth-container {
@@ -700,5 +747,53 @@ textarea.form-input {
 
   .dashboard-title {
     font-size: 24px;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10px);
+  }
+  75% {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-50%) scale(1.2);
+  }
+  100% {
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

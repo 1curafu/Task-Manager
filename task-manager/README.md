@@ -1,6 +1,8 @@
-# 📋 Task Manager
+# ⛵ Vela
 
-A modern task management web application built with Next.js 16, TypeScript, Prisma, and Supabase.
+**Set your sails**
+
+A modern team collaboration and task management platform built with Next.js, TypeScript, Prisma, and Supabase.
 
 ## 🚀 Tech Stack
 
@@ -75,11 +77,20 @@ DIRECT_URL="postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler
 2. Go to **Project Settings** → **Database** → **Connection string**
 3. Copy your connection strings and update `.env` files
 
-### 5. Run database migrations
+### 5. Set up the database
+
+⚠️ **Important:** Follow the complete database setup guide:
 
 ```bash
-npx prisma migrate dev --name init
+# See DATABASE_SETUP.md for detailed instructions
 ```
+
+Quick steps:
+1. Run Prisma migrations: `npx prisma migrate deploy`
+2. Run `prisma/fix-uuid-defaults.sql` in Supabase SQL Editor
+3. Run `prisma/enable-rls.sql` in Supabase SQL Editor
+
+**📖 [Full Database Setup Guide](./DATABASE_SETUP.md)**
 
 ### 6. Generate Prisma Client
 
