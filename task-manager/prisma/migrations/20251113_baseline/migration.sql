@@ -1,0 +1,1 @@
+-- Baseline migration: Database already up to date via Supabase SQL Editor
