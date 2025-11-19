@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabaseClient'
+import Image from 'next/image'
 import ConfirmModal from './ConfirmModal'
 import './TeamsPanel.css'
 
@@ -18,6 +19,8 @@ interface TeamMember {
   teamId: string
   userId: string | null
   userEmail: string
+  name?: string | null
+  avatar?: string | null
   role: 'owner' | 'admin' | 'member'
   status: 'pending' | 'accepted' | 'declined'
   invitedBy: string
@@ -50,7 +53,6 @@ export default function TeamsPanel({
         .eq('ownerId', userId)
 
       if (ownedError) {
-        console.error('Error loading owned teams:', ownedError)
         setTeams([])
         setLoading(false)
         return
@@ -60,7 +62,6 @@ export default function TeamsPanel({
         .rpc('get_user_member_teams', { user_id_param: userId })
 
       if (memberError) {
-        console.error('Error loading member teams:', memberError)
         setTeams(ownedTeams || [])
         setLoading(false)
         return
@@ -108,7 +109,6 @@ export default function TeamsPanel({
                   className="team-preview-item"
                   onClick={() => setShowTeamsModal(true)}
                 >
-                  <div className="team-icon">👥</div>
                   <div className="team-info">
                     <h4 className="team-name">{team.name}</h4>
                   </div>
@@ -215,7 +215,6 @@ function TeamsModal({ userId, userEmail, teams, onClose, onUpdate }: {
               <TeamDetailsContent
                 teamId={selectedTeamId}
                 userId={userId}
-                userEmail={userEmail}
                 onUpdate={onUpdate}
               />
             )}
@@ -291,7 +290,6 @@ function CreateTeamModal({ userId, userEmail, onClose, onUpdate }: {
       onUpdate()
       onClose()
     } catch (err) {
-      console.error('Error creating team:', err)
       setError(err instanceof Error ? err.message : 'Failed to create team')
     } finally {
       setLoading(false)
@@ -363,10 +361,9 @@ function CreateTeamModal({ userId, userEmail, onClose, onUpdate }: {
   )
 }
 
-function TeamDetailsContent({ teamId, userId, userEmail, onUpdate }: {
+function TeamDetailsContent({ teamId, userId, onUpdate }: {
   teamId: string
   userId: string
-  userEmail: string
   onUpdate: () => void
 }) {
   const [team, setTeam] = useState<Team | null>(null)
@@ -406,7 +403,31 @@ function TeamDetailsContent({ teamId, userId, userEmail, onUpdate }: {
         })
 
       if (membersError) throw membersError
-      setMembers(membersData || [])
+      
+      // Fetch profile data for members with userId
+      const memberIds = (membersData || []).filter((m: TeamMember) => m.userId).map((m: TeamMember) => m.userId)
+      
+      if (memberIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('Profile')
+          .select('userId, name, avatar')
+          .in('userId', memberIds)
+        
+        const profileMap = new Map(profiles?.map(p => [p.userId, p]) || [])
+        
+        const enrichedMembers = (membersData || []).map((member: TeamMember) => {
+          const profile = member.userId ? profileMap.get(member.userId) : null
+          return {
+            ...member,
+            name: profile?.name || null,
+            avatar: profile?.avatar ? `${profile.avatar}?t=${Date.now()}` : null
+          }
+        })
+        
+        setMembers(enrichedMembers)
+      } else {
+        setMembers(membersData || [])
+      }
     } catch (err) {
       console.error('Error loading team details:', err)
     } finally {
@@ -720,10 +741,18 @@ function TeamDetailsContent({ teamId, userId, userEmail, onUpdate }: {
             {members.map((member) => (
               <div key={member.id} className="member-item">
                 <div className="member-avatar">
-                  {member.userEmail ? member.userEmail.charAt(0).toUpperCase() : '?'}
+                  {member.avatar ? (
+                    <Image src={member.avatar} alt={member.name || member.userEmail || 'User'} width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    member.name ? member.name.charAt(0).toUpperCase() : (member.userEmail ? member.userEmail.charAt(0).toUpperCase() : '?')
+                  )}
                 </div>
                 <div className="member-info">
-                  <div className="member-email">{member.userEmail || 'Pending...'}</div>
+                  <div className="member-email">
+                    {member.name && <span style={{ fontWeight: 500 }}>{member.name}</span>}
+                    {member.name && member.userEmail && <span style={{ color: '#8e8e93', fontSize: '0.9em', marginLeft: '8px' }}>({member.userEmail})</span>}
+                    {!member.name && (member.userEmail || 'Pending...')}
+                  </div>
                   <div className="member-meta">
                     <span className={`member-role ${member.role}`}>
                       {member.role === 'owner' && '👑 '}

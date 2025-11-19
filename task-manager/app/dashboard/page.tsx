@@ -13,6 +13,7 @@ import TaskCard from '@/components/TaskCard'
 import TaskList from '@/components/TaskList'
 import CalendarView from '@/components/CalendarView'
 import ConfirmModal from '@/components/ConfirmModal'
+import ProfileModal from '@/components/ProfileModal'
 import './dashboard.css'
 
 interface Task {
@@ -35,6 +36,8 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([])
   const [userId, setUserId] = useState<string>('')
   const [userEmail, setUserEmail] = useState<string>('')
+  const [userName, setUserName] = useState<string>('')
+  const [userAvatar, setUserAvatar] = useState<string>('')
   const [loading, setLoading] = useState(true)
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
@@ -45,6 +48,8 @@ export default function DashboardPage() {
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null)
   const [showTaskDetails, setShowTaskDetails] = useState(false)
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   
   const router = useRouter()
   const supabase = createClient()
@@ -57,10 +62,13 @@ export default function DashboardPage() {
         .or(`userId.eq.${userId},assignedToId.eq.${userId}`)
         .order('dueDate', { ascending: true })
 
-      if (error) throw error
+      if (error) {
+        setTasks([])
+        return
+      }
       setTasks(data || [])
-    } catch (err) {
-      console.error('Error loading tasks:', err)
+    } catch {
+      setTasks([])
     }
   }
 
@@ -74,8 +82,8 @@ export default function DashboardPage() {
 
       if (error) throw error
       setUnreadCount(count || 0)
-    } catch (err) {
-      console.error('Error loading unread count:', err)
+    } catch {
+      // Silent error handling
     }
   }
 
@@ -90,6 +98,20 @@ export default function DashboardPage() {
 
       setUserId(session.user.id)
       setUserEmail(session.user.email || '')
+      setIsAdmin(session.user.user_metadata?.isAdmin === true)
+      
+      // Fetch profile data
+      const { data: profile } = await supabase
+        .from('Profile')
+        .select('name, avatar')
+        .eq('userId', session.user.id)
+        .single()
+      
+      if (profile) {
+        setUserName(profile.name || '')
+        setUserAvatar(profile.avatar || '')
+      }
+      
       setLoading(false)
     }
 
@@ -108,11 +130,8 @@ export default function DashboardPage() {
 
   const checkPendingInvites = async () => {
     if (!userId || !userEmail) {
-      console.log('checkPendingInvites: No userId or userEmail', { userId, userEmail })
       return
     }
-
-    console.log('Checking pending invites for:', userEmail)
 
     try {
       const { data: pendingInvites, error } = await supabase
@@ -121,16 +140,11 @@ export default function DashboardPage() {
         .eq('userEmail', userEmail)
         .eq('status', 'pending')
 
-      console.log('Pending invites query result:', { pendingInvites, error })
-
       if (error) {
-        console.error('Error fetching pending invites:', error)
         return
       }
 
       if (pendingInvites && pendingInvites.length > 0) {
-        console.log(`Found ${pendingInvites.length} pending invite(s)`)
-        
         for (const invite of pendingInvites) {
           const { data: existingNotif } = await supabase
             .from('Notification')
@@ -140,8 +154,6 @@ export default function DashboardPage() {
             .eq('link', `/dashboard?acceptInvite=${invite.id}`)
             .maybeSingle()
 
-          console.log('Existing notification check:', { existingNotif, inviteId: invite.id })
-
           if (!existingNotif) {
             const { data: team } = await supabase
               .from('Team')
@@ -150,10 +162,8 @@ export default function DashboardPage() {
               .maybeSingle()
 
             const teamName = team?.name || 'a team'
-            
-            console.log('Creating notification for team:', teamName)
               
-            const { data: newNotif, error: notifError } = await supabase
+            await supabase
               .from('Notification')
               .insert({
                 userId: userId,
@@ -163,18 +173,13 @@ export default function DashboardPage() {
                 link: `/dashboard?acceptInvite=${invite.id}`,
               })
               .select()
-
-            console.log('Notification creation result:', { newNotif, notifError })
           }
         }
         
-        console.log('Reloading notification count...')
         await loadUnreadCount()
-      } else {
-        console.log('No pending invites found')
       }
-    } catch (err) {
-      console.error('Error checking pending invites:', err)
+    } catch {
+      // Silent error handling
     }
   }
 
@@ -232,8 +237,7 @@ export default function DashboardPage() {
 
       if (error) throw error
       await loadTasks()
-    } catch (err) {
-      console.error('Error deleting task:', err)
+    } catch {
       alert('Failed to delete task')
     } finally {
       setTaskToDelete(null)
@@ -250,13 +254,9 @@ export default function DashboardPage() {
         })
         .eq('id', taskId)
 
-      if (error) {
-        console.error('Error updating task status:', error)
-        throw error
-      }
+      if (error) throw error
       await loadTasks()
-    } catch (err) {
-      console.error('Error updating task:', err)
+    } catch {
       alert('Failed to update task status')
     }
   }
@@ -304,7 +304,11 @@ export default function DashboardPage() {
               aria-label="User menu"
             >
               <div className="avatar">
-                {getUserInitials(userEmail)}
+                {userAvatar ? (
+                  <Image src={userAvatar} alt={userName || userEmail} width={40} height={40} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+                ) : (
+                  getUserInitials(userName || userEmail)
+                )}
               </div>
             </button>
             
@@ -312,19 +316,29 @@ export default function DashboardPage() {
               <div className="profile-dropdown">
                 <div className="dropdown-header">
                   <div className="dropdown-avatar">
-                    {getUserInitials(userEmail)}
+                    {userAvatar ? (
+                      <Image src={userAvatar} alt={userName || userEmail} width={48} height={48} style={{ borderRadius: '50%', objectFit: 'cover' }} />
+                    ) : (
+                      getUserInitials(userName || userEmail)
+                    )}
                   </div>
                   <div className="dropdown-user-info">
+                    {userName && <span className="dropdown-name">{userName}</span>}
                     <span className="dropdown-email">{userEmail}</span>
                   </div>
                 </div>
                 <div className="dropdown-divider"></div>
-                <button className="dropdown-item">
+                <button className="dropdown-item" onClick={() => {
+                  setShowProfileDropdown(false)
+                  setShowProfileModal(true)
+                }}>
                   <span>Profile</span>
                 </button>
-                <button className="dropdown-item">
-                  <span>Settings</span>
-                </button>
+                {isAdmin && (
+                  <button className="dropdown-item" onClick={() => router.push('/admin')}>
+                    <span>Admin Dashboard</span>
+                  </button>
+                )}
                 <div className="dropdown-divider"></div>
                 <button className="dropdown-item logout-item" onClick={handleLogout}>
                   <span>Logout</span>
@@ -414,6 +428,27 @@ export default function DashboardPage() {
         }}
       />
 
+      {showProfileModal && (
+        <ProfileModal
+          userEmail={userEmail}
+          onClose={async () => {
+            setShowProfileModal(false)
+            // Reload profile data with a small delay to ensure DB is updated
+            await new Promise(resolve => setTimeout(resolve, 500))
+            const { data: profile } = await supabase
+              .from('Profile')
+              .select('name, avatar')
+              .eq('userId', userId)
+              .single()
+            if (profile) {
+              setUserName(profile.name || '')
+              // Add timestamp to force image refresh (bypass Next.js cache)
+              setUserAvatar(profile.avatar ? `${profile.avatar}?t=${Date.now()}` : '')
+            }
+          }}
+        />
+      )}
+
       {showTaskDetails && selectedTask && (
         <TaskDetailsModal
           task={selectedTask}
@@ -456,7 +491,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
   const [loading, setLoading] = useState(false)
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [teams, setTeams] = useState<Array<{ id: string; name: string; role: string }>>([])
-  const [teamMembers, setTeamMembers] = useState<Array<{ userId: string; userEmail: string }>>([])
+  const [teamMembers, setTeamMembers] = useState<Array<{ userId: string; userEmail: string; name?: string; avatar?: string }>>([])
   const debounceTimers = useRef<Record<string, NodeJS.Timeout>>({})
   const supabase = createClient()
 
@@ -480,12 +515,18 @@ function TaskModal({ task, userId, onClose, onSave }: {
         if (memberError) throw memberError
 
         const teamIds = memberTeams?.map(m => m.teamId) || []
-        const { data: memberTeamDetails, error: detailsError } = await supabase
-          .from('Team')
-          .select('id, name')
-          .in('id', teamIds)
+        
+        let memberTeamDetails: Array<{ id: string; name: string }> = []
+        if (teamIds.length > 0) {
+          const { data, error: detailsError } = await supabase
+            .from('Team')
+            .select('id, name')
+            .in('id', teamIds)
 
-        if (detailsError) throw detailsError
+          if (detailsError) throw detailsError
+          
+          memberTeamDetails = data || []
+        }
 
         const allTeams = [
           ...(ownedTeams || []).map(t => ({ ...t, role: 'owner' })),
@@ -500,8 +541,8 @@ function TaskModal({ task, userId, onClose, onSave }: {
         )
 
         setTeams(uniqueTeams)
-      } catch (err) {
-        console.error('Error loading teams:', err)
+      } catch {
+        setTeams([])
       }
     }
 
@@ -516,7 +557,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
       }
 
       try {
-        const { data, error } = await supabase
+        const { data: teamMemberData, error } = await supabase
           .from('TeamMember')
           .select('userId, userEmail')
           .eq('teamId', formData.teamId)
@@ -524,9 +565,16 @@ function TaskModal({ task, userId, onClose, onSave }: {
           .not('userId', 'is', null)
 
         if (error) throw error
-        setTeamMembers(data || [])
-      } catch (err) {
-        console.error('Error loading team members:', err)
+
+        const members = (teamMemberData || []).map((member: { userId: string; userEmail: string }) => ({
+          userId: member.userId,
+          userEmail: member.userEmail,
+          name: undefined,
+          avatar: undefined
+        }))
+
+        setTeamMembers(members)
+      } catch {
         setTeamMembers([])
       }
     }
@@ -620,7 +668,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
 
         if (error) throw error
       } else {
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('Task')
           .insert({
             ...taskData,
@@ -629,16 +677,12 @@ function TaskModal({ task, userId, onClose, onSave }: {
           .select()
 
         if (error) {
-          console.error('Supabase error details:', error)
           throw new Error(`Supabase error: ${error.message} (Code: ${error.code})`)
         }
-        
-        console.log('Task created successfully:', data)
       }
 
       onSave()
     } catch (err) {
-      console.error('Error saving task:', err)
       
       if (err && typeof err === 'object' && 'issues' in err) {
         const zodErrors = err as { issues: Array<{ path: (string | number)[]; message: string }> }
@@ -743,7 +787,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
                     <option value="">Select member...</option>
                     {teamMembers.map((member) => (
                       <option key={member.userId} value={member.userId}>
-                        {member.userEmail}
+                        {member.name ? `${member.name} (${member.userEmail})` : member.userEmail}
                       </option>
                     ))}
                   </select>
