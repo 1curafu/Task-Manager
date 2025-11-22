@@ -14,8 +14,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Vela - Set your sails",
-  description: "A modern team collaboration and task management platform",
+  metadataBase: new URL('https://vela.works'),
+  title: {
+    default: "Vela - Set your sails",
+    template: "%s | Vela"
+  },
+  description: "A modern team collaboration and task management platform designed to help you organize, track, and manage your work efficiently.",
+  keywords: ["task management", "collaboration", "productivity", "teamwork", "project management"],
+  openGraph: {
+    title: "Vela - Set your sails",
+    description: "A modern team collaboration and task management platform",
+    url: 'https://vela.works',
+    siteName: 'Vela',
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Vela - Set your sails",
+    description: "A modern team collaboration and task management platform",
+  },
 };
 
 export default function RootLayout({
