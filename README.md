@@ -423,7 +423,7 @@ DELETE /api/tasks/:id         # Delete task
 
 ### Deploy to Vercel
 
-[![Deploy](https://img.shields.io/badge/▲_Deploy-black?style=for-the-badge)](https://task-manager-pi-weld.vercel.app)
+[![Deploy](https://img.shields.io/badge/▲_Deploy-black?style=for-the-badge)](https://www.vela.works/)
 
 #### Manual Deployment
 
