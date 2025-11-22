@@ -15,7 +15,20 @@ export function ThemeToggle() {
     if (!mounted) {
         return (
             <button className="theme-toggle-button" aria-label="Toggle theme">
-                <div className="theme-toggle-placeholder" />
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="theme-icon opacity-50"
+                >
+                    <circle cx="12" cy="12" r="5" />
+                </svg>
             </button>
         )
     }

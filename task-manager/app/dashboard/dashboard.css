@@ -66,6 +66,10 @@
   color: var(--primary-color);
 }
 
+:root[class~="dark"] .inbox-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .inbox-badge {
   position: absolute;
   top: 4px;
@@ -86,9 +90,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
@@ -147,6 +154,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -216,6 +224,10 @@
 .dropdown-item:hover {
   background: var(--background);
   transform: translateX(2px);
+}
+
+:root[class~="dark"] .dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .dropdown-item span {
@@ -299,6 +311,17 @@
   background: var(--surface);
   transform: translateX(6px);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+:root[class~="dark"] .task-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:root[class~="dark"] .task-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .task-item-content {
@@ -538,12 +561,12 @@
   flex-direction: column;
 }
 
-.task-modal > * {
+.task-modal>* {
   padding-left: 56px;
   padding-right: 64px;
 }
 
-.task-modal > form {
+.task-modal>form {
   overflow-y: auto;
   padding-top: 0;
   padding-bottom: 64px;
@@ -551,23 +574,23 @@
   scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
-.task-modal > form::-webkit-scrollbar {
+.task-modal>form::-webkit-scrollbar {
   width: 8px;
 }
 
-.task-modal > form::-webkit-scrollbar-track {
+.task-modal>form::-webkit-scrollbar-track {
   background: transparent;
   margin: 12px 0 28px 0;
 }
 
-.task-modal > form::-webkit-scrollbar-thumb {
+.task-modal>form::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.15);
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
-.task-modal > form::-webkit-scrollbar-thumb:hover {
+.task-modal>form::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 0, 0, 0.25);
   border: 2px solid transparent;
   background-clip: padding-box;
@@ -769,13 +792,13 @@
   .dashboard-title {
     font-size: 20px;
   }
-  
+
   .task-card-header {
     flex-direction: column;
     gap: 12px;
     align-items: flex-start;
   }
-  
+
   .task-item {
     flex-direction: column;
     align-items: flex-start;

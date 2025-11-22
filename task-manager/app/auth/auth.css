@@ -1,3 +1,15 @@
+.auth-layout {
+  position: relative;
+  min-height: 100vh;
+}
+
+.auth-theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  z-index: 1001;
+}
+
 .auth-overlay {
   display: flex;
   justify-content: center;
@@ -193,11 +205,20 @@
   margin-bottom: 24px;
 }
 
+:root[class~="dark"] .success-note {
+  background: rgba(255, 204, 0, 0.1);
+  border-color: rgba(255, 204, 0, 0.3);
+}
+
 .success-note p {
   font-size: 14px;
   color: #333;
   margin: 0;
   line-height: 1.6;
+}
+
+:root[class~="dark"] .success-note p {
+  color: #f5f5f7;
 }
 
 .success-note p:first-child {
@@ -206,6 +227,10 @@
 
 .success-note strong {
   color: #000;
+}
+
+:root[class~="dark"] .success-note strong {
+  color: #fff;
 }
 
 .link-button {
@@ -245,6 +270,74 @@
   }
 }
 
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.auth-divider span {
+  padding: 0 12px;
+}
+
+.social-login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.btn-social:hover {
+  background: var(--background);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+:root[class~="dark"] .btn-social {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+:root[class~="dark"] .btn-social:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.social-icon {
+  width: 20px;
+  height: 20px;
+}
+
+:root[class~="dark"] .social-icon {
+  --icon-filter: invert(1);
+}
 
 @media (max-width: 768px) {
   .auth-modal {
