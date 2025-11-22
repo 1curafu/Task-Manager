@@ -788,24 +788,35 @@ textarea.form-input {
 @media (max-width: 768px) {
   .dashboard {
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 20px;
+    gap: 24px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
   }
 
   .sidebar {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 16px;
+    order: 2; /* Move sidebar below main content on mobile */
   }
-
-  .notes-panel {
-    height: 280px;
+  
+  .main-content {
+    order: 1;
   }
 
   .task-cards-grid {
     grid-template-columns: 1fr;
-    gap: 16px;
   }
+  
+  .clock-container {
+    display: none;
+  }
+  
+  .notes-panel {
+    height: 400px;
+  }
+
 
   .calendar-grid {
     gap: 4px;
@@ -837,12 +848,32 @@ textarea.form-input {
 
   .auth-card,
   .auth-modal {
-    padding: 32px;
+    padding: 32px 24px;
   }
 
-  .task-modal {
-    padding: 32px;
+  .task-modal,
+  .task-details-modal {
     max-width: 100%;
+    max-height: 100vh;
+    margin: 0;
+    border-radius: var(--radius-lg);
+  }
+  
+  .task-modal > * {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+  
+  .modal-title {
+    font-size: 28px;
+  }
+  
+  .task-details-content {
+    padding: 20px;
+  }
+  
+  .modal-header {
+    padding: 20px 24px;
   }
 
   body {
@@ -852,7 +883,7 @@ textarea.form-input {
 
 @media (max-width: 480px) {
   .dashboard {
-    padding: 16px;
+    padding: 12px;
   }
 
   .card {
@@ -860,6 +891,32 @@ textarea.form-input {
   }
 
   .dashboard-title {
+    font-size: 22px;
+  }
+  
+  .top-navbar {
+    padding: 10px 12px;
+  }
+  
+  .navbar-branding {
+    gap: 8px;
+  }
+  
+  .btn {
+    font-size: 15px;
+    padding: 10px 20px;
+  }
+  
+  .form-input,
+  .form-select {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .auth-title {
+    font-size: 28px;
+  }
+  
+  .modal-title {
     font-size: 24px;
   }
 }

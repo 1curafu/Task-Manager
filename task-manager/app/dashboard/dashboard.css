@@ -769,11 +769,12 @@
 
 @media (max-width: 768px) {
   .top-navbar {
-    padding: 12px 20px;
+    padding: 12px 16px;
   }
 
   .navbar-title {
     font-size: 20px;
+    display: none;
   }
 
   .navbar-logo {
@@ -803,5 +804,15 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+  }
+  
+  .task-item-content {
+    width: 100%;
+  }
+  
+  .task-actions {
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 8px;
   }
 }
