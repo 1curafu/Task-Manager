@@ -14,6 +14,7 @@ import TaskList from '@/components/TaskList'
 import CalendarView from '@/components/CalendarView'
 import ConfirmModal from '@/components/ConfirmModal'
 import ProfileModal from '@/components/ProfileModal'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import './dashboard.css'
 
 interface Task {
@@ -50,7 +51,7 @@ export default function DashboardPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [showProfileModal, setShowProfileModal] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
-  
+
   const router = useRouter()
   const supabase = createClient()
 
@@ -90,7 +91,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      
+
       if (!session) {
         router.push('/auth/login')
         return
@@ -99,24 +100,24 @@ export default function DashboardPage() {
       setUserId(session.user.id)
       setUserEmail(session.user.email || '')
       setIsAdmin(session.user.user_metadata?.isAdmin === true)
-      
+
       // Fetch profile data
       const { data: profile } = await supabase
         .from('Profile')
         .select('name, avatar')
         .eq('userId', session.user.id)
         .single()
-      
+
       if (profile) {
         setUserName(profile.name || '')
         setUserAvatar(profile.avatar || '')
       }
-      
+
       setLoading(false)
     }
 
     checkAuth()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -125,7 +126,7 @@ export default function DashboardPage() {
       loadUnreadCount()
       checkPendingInvites()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
   const checkPendingInvites = async () => {
@@ -162,7 +163,7 @@ export default function DashboardPage() {
               .maybeSingle()
 
             const teamName = team?.name || 'a team'
-              
+
             await supabase
               .from('Notification')
               .insert({
@@ -175,7 +176,7 @@ export default function DashboardPage() {
               .select()
           }
         }
-        
+
         await loadUnreadCount()
       }
     } catch {
@@ -214,7 +215,7 @@ export default function DashboardPage() {
     if (!task) return
 
     const canDelete = task.createdById === userId || (task.userId === userId && !task.createdById)
-    
+
     if (!canDelete) {
       alert('You can only delete tasks you created. Tasks assigned by team owner/admin cannot be deleted.')
       return
@@ -226,7 +227,7 @@ export default function DashboardPage() {
 
   const confirmDeleteTask = async () => {
     if (!taskToDelete) return
-    
+
     setShowConfirmModal(false)
 
     try {
@@ -248,7 +249,7 @@ export default function DashboardPage() {
     try {
       const { error } = await supabase
         .from('Task')
-        .update({ 
+        .update({
           completed: !currentStatus,
           lastUpdated: new Date().toISOString()
         })
@@ -285,20 +286,21 @@ export default function DashboardPage() {
           <h1 className="navbar-title">Vela</h1>
         </div>
         <div className="navbar-menu">
-          <button 
+          <button
             className="inbox-button"
             onClick={() => setShowInbox(true)}
             aria-label="Inbox"
           >
             <svg className="inbox-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             {unreadCount > 0 && (
               <span className="inbox-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
             )}
           </button>
+          <ThemeToggle />
           <div className="profile-menu">
-            <button 
+            <button
               className="avatar-button"
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
               aria-label="User menu"
@@ -311,7 +313,7 @@ export default function DashboardPage() {
                 )}
               </div>
             </button>
-            
+
             {showProfileDropdown && (
               <div className="profile-dropdown">
                 <div className="dropdown-header">
@@ -406,7 +408,7 @@ export default function DashboardPage() {
       )}
 
       {showInbox && (
-        <InboxPanel 
+        <InboxPanel
           userId={userId}
           onClose={() => {
             setShowInbox(false)
@@ -515,7 +517,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
         if (memberError) throw memberError
 
         const teamIds = memberTeams?.map(m => m.teamId) || []
-        
+
         let memberTeamDetails: Array<{ id: string; name: string }> = []
         if (teamIds.length > 0) {
           const { data, error: detailsError } = await supabase
@@ -524,7 +526,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
             .in('id', teamIds)
 
           if (detailsError) throw detailsError
-          
+
           memberTeamDetails = data || []
         }
 
@@ -593,7 +595,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
     try {
       const { taskSchema } = await import('@/lib/validations')
       await taskSchema.shape[fieldName as keyof typeof taskSchema.shape].parseAsync(value)
-      
+
       setErrors((prev) => {
         const newErrors = { ...prev }
         delete newErrors[fieldName]
@@ -612,16 +614,16 @@ function TaskModal({ task, userId, onClose, onSave }: {
 
   const handleFieldChange = (fieldName: string, value: string) => {
     setFormData({ ...formData, [fieldName]: value })
-    
+
     if (fieldName === 'teamId' && !value) {
       setFormData({ ...formData, teamId: '', assignedToId: '' })
     }
-    
+
     if (touched[fieldName]) {
       if (debounceTimers.current[fieldName]) {
         clearTimeout(debounceTimers.current[fieldName])
       }
-      
+
       debounceTimers.current[fieldName] = setTimeout(() => {
         validateField(fieldName, value)
       }, 300)
@@ -683,7 +685,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
 
       onSave()
     } catch (err) {
-      
+
       if (err && typeof err === 'object' && 'issues' in err) {
         const zodErrors = err as { issues: Array<{ path: (string | number)[]; message: string }> }
         const fieldErrors: Record<string, string> = {}
@@ -696,7 +698,7 @@ function TaskModal({ task, userId, onClose, onSave }: {
         setErrors(fieldErrors)
         return
       }
-      
+
       const errorMessage = err instanceof Error ? err.message : 'Failed to save task. Please check if RLS policies are enabled.'
       alert(errorMessage)
     } finally {
@@ -917,10 +919,10 @@ function TaskDetailsModal({ task, userId, onClose, onEdit, onDelete }: {
             <div className="task-detail-section">
               <label className="task-detail-label">Due Date</label>
               <p className="task-detail-value">
-                {new Date(task.dueDate).toLocaleDateString('en-US', { 
-                  month: 'long', 
-                  day: 'numeric', 
-                  year: 'numeric' 
+                {new Date(task.dueDate).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
                 })}
               </p>
             </div>
