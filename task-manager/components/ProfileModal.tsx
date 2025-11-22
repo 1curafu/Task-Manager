@@ -17,6 +17,13 @@ interface ProfileData {
   avatar: string
 }
 
+/**
+ * Profile settings modal component.
+ * Allows users to update their profile information (name, avatar), change password, and delete their account.
+ * 
+ * @param userEmail - The current email of the user.
+ * @param onClose - Callback to close the modal.
+ */
 export default function ProfileModal({ userEmail, onClose }: ProfileModalProps) {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)

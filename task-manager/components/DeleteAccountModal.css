@@ -20,6 +20,11 @@
   width: 90%;
 }
 
+:root[class~="dark"] .delete-account-modal {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .delete-account-modal h2 {
   color: #d32f2f;
   margin-bottom: 1rem;
@@ -36,6 +41,11 @@
   padding: 1rem;
   margin-bottom: 1rem;
   border-radius: 4px;
+}
+
+:root[class~="dark"] .delete-account-warning {
+  background: rgba(255, 152, 0, 0.1);
+  border-left-color: #ff9800;
 }
 
 .delete-account-warning p {
@@ -55,6 +65,10 @@
   font-size: 0.95rem;
   color: #333;
   cursor: pointer;
+}
+
+:root[class~="dark"] .delete-account-confirmation label {
+  color: #f5f5f7;
 }
 
 .delete-account-confirmation input[type="checkbox"] {
@@ -86,8 +100,17 @@
   color: #333;
 }
 
+:root[class~="dark"] .delete-account-cancel-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f5f5f7;
+}
+
 .delete-account-cancel-btn:hover {
   background: #d0d0d0;
+}
+
+:root[class~="dark"] .delete-account-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .delete-account-confirm-btn {

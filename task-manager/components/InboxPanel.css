@@ -25,11 +25,17 @@
   animation: slideInRight 0.3s ease;
 }
 
+:root[class~="dark"] .inbox-modal {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 @keyframes slideInRight {
   from {
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -50,6 +56,10 @@
   color: var(--text-primary);
   margin: 0 0 4px 0;
   letter-spacing: -0.02em;
+}
+
+:root[class~="dark"] .inbox-title {
+  color: #f5f5f7;
 }
 
 .inbox-unread-count {
@@ -115,6 +125,15 @@
   transform: scale(1.05);
 }
 
+:root[class~="dark"] .inbox-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f5f5f7;
+}
+
+:root[class~="dark"] .inbox-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .inbox-content {
   flex: 1;
   overflow-y: auto;
@@ -146,6 +165,10 @@
   margin: 0 0 8px 0;
 }
 
+:root[class~="dark"] .inbox-empty-title {
+  color: #f5f5f7;
+}
+
 .inbox-empty-text {
   font-size: 14px;
   color: var(--text-secondary);
@@ -168,12 +191,21 @@
   background: var(--surface);
 }
 
+:root[class~="dark"] .inbox-item {
+  background: #1c1c1e;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
 .inbox-item:last-child {
   border-bottom: none;
 }
 
 .inbox-item:hover {
   background: var(--background);
+}
+
+:root[class~="dark"] .inbox-item:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .inbox-item-unread {
@@ -198,6 +230,10 @@
   border-radius: 50%;
 }
 
+:root[class~="dark"] .inbox-item-icon {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .inbox-item-content {
   flex: 1;
   min-width: 0;
@@ -217,6 +253,10 @@
   color: var(--text-primary);
   margin: 0;
   line-height: 1.4;
+}
+
+:root[class~="dark"] .inbox-item-title {
+  color: #f5f5f7;
 }
 
 .inbox-item-time {
