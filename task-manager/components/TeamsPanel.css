@@ -11,6 +11,11 @@
   border: none;
 }
 
+:root[class~="dark"] .teams-panel {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .teams-panel.card-style {
   flex-direction: column;
   align-items: flex-start;
@@ -23,6 +28,10 @@
   color: var(--text-primary);
   margin: 0;
   white-space: nowrap;
+}
+
+:root[class~="dark"] .teams-title {
+  color: #f5f5f7;
 }
 
 .teams-loading {
@@ -78,6 +87,16 @@
   box-shadow: var(--shadow);
 }
 
+:root[class~="dark"] .team-preview-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+:root[class~="dark"] .team-preview-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-color);
+}
+
 .team-preview-item .team-icon {
   font-size: 22px;
   width: 36px;
@@ -105,6 +124,10 @@
   text-overflow: ellipsis;
 }
 
+:root[class~="dark"] .team-preview-item .team-name {
+  color: #f5f5f7;
+}
+
 .teams-view-all {
   padding: 10px 20px;
   background: var(--background);
@@ -115,6 +138,15 @@
   cursor: pointer;
   border-radius: var(--radius-lg);
   transition: all 0.2s ease;
+}
+
+:root[class~="dark"] .teams-view-all {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+:root[class~="dark"] .teams-view-all:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .teams-view-all:hover {
@@ -208,6 +240,16 @@
   border-color: var(--accent);
 }
 
+:root[class~="dark"] .team-card {
+  background: #1c1c1e;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+:root[class~="dark"] .team-card:hover {
+  border-color: var(--primary-color);
+  background: rgba(255, 255, 255, 0.05);
+}
+
 .team-card .team-icon {
   font-size: 28px;
   width: 48px;
@@ -230,6 +272,10 @@
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 4px 0;
+}
+
+:root[class~="dark"] .team-card .team-name {
+  color: #f5f5f7;
 }
 
 .team-card .team-description {
@@ -268,9 +314,19 @@
   animation: slideUp 0.3s ease;
 }
 
+:root[class~="dark"] .modal-content {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
@@ -278,6 +334,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -300,12 +357,21 @@
   z-index: 1;
 }
 
+:root[class~="dark"] .modal-header {
+  background: #1c1c1e;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
 .modal-title {
   font-size: 20px;
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--text-primary);
   margin: 0;
+}
+
+:root[class~="dark"] .modal-title {
+  color: #f5f5f7;
 }
 
 .modal-close-btn {
@@ -329,6 +395,16 @@
   color: var(--accent);
 }
 
+:root[class~="dark"] .modal-close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f5f5f7;
+}
+
+:root[class~="dark"] .modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .modal-form {
   padding: 24px;
 }
@@ -345,6 +421,10 @@
   margin-bottom: 8px;
 }
 
+:root[class~="dark"] .form-label {
+  color: #f5f5f7;
+}
+
 .form-input,
 .form-textarea,
 .form-select {
@@ -357,6 +437,14 @@
   color: var(--text-primary);
   transition: all 0.2s ease;
   font-family: inherit;
+}
+
+:root[class~="dark"] .form-input,
+:root[class~="dark"] .form-textarea,
+:root[class~="dark"] .form-select {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f5f5f7;
 }
 
 .form-input:focus,
@@ -405,6 +493,11 @@
   margin-bottom: 24px;
 }
 
+:root[class~="dark"] .invite-form {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 .invite-form-row {
   display: flex;
   gap: 12px;
@@ -443,6 +536,15 @@
   background: var(--hover);
 }
 
+:root[class~="dark"] .member-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+:root[class~="dark"] .member-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .member-avatar {
   width: 40px;
   height: 40px;
@@ -472,6 +574,10 @@
   text-overflow: ellipsis;
 }
 
+:root[class~="dark"] .member-email {
+  color: #f5f5f7;
+}
+
 .member-meta {
   display: flex;
   gap: 8px;
@@ -490,6 +596,11 @@
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text-secondary);
+}
+
+:root[class~="dark"] .member-role {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .member-role.owner {
@@ -514,6 +625,11 @@
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text-secondary);
+}
+
+:root[class~="dark"] .member-status {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .member-status.pending {

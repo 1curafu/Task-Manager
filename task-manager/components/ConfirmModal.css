@@ -17,6 +17,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -32,11 +33,17 @@
   animation: slideUp 0.3s ease-out;
 }
 
+:root[class~="dark"] .confirm-modal {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -50,12 +57,20 @@
   margin: 0 0 12px 0;
 }
 
+:root[class~="dark"] .confirm-modal-title {
+  color: #f5f5f7;
+}
+
 .confirm-modal-message {
   font-size: 15px;
   color: var(--text-secondary);
   margin: 0 0 24px 0;
   line-height: 1.5;
   white-space: pre-line;
+}
+
+:root[class~="dark"] .confirm-modal-message {
+  color: #86868b;
 }
 
 .confirm-modal-actions {
@@ -83,6 +98,14 @@
 
 .confirm-modal-actions .btn-secondary:hover {
   background: rgba(0, 0, 0, 0.05);
+}
+
+:root[class~="dark"] .confirm-modal-actions .btn-secondary {
+  color: #f5f5f7;
+}
+
+:root[class~="dark"] .confirm-modal-actions .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .confirm-modal-actions .btn-primary {
