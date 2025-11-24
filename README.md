@@ -377,7 +377,7 @@ All tables use Supabase RLS policies:
 - **Admin panel** restricted to authorized users
 - **Audit trails** for admin actions
 
-## 🎨 UI/UX
+## UI/UX
 
 ### Design System
 
@@ -503,14 +503,14 @@ See [LICENSE](LICENSE) file for details.
 - GitHub: [@1curafu](https://github.com/1curafu)
 - Repository: [Task-Manager](https://github.com/1curafu/Task-Manager)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Next.js](https://nextjs.org/) for the amazing framework
 - [Supabase](https://supabase.com/) for backend infrastructure
 - [Prisma](https://www.prisma.io/) for database tooling
 - [Vercel](https://vercel.com/) for deployment platform
 
-## 📞 Support
+## Support
 
 For questions or issues:
 
