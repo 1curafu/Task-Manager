@@ -1,4 +1,4 @@
-# 📋 Task Manager
+# Task Manager
 
 > A modern, collaborative task management application built with Next.js 16, Supabase, and Prisma.
 
@@ -8,9 +8,9 @@
 ![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20Storage-green?style=flat&logo=supabase)
 ![Prisma](https://img.shields.io/badge/Prisma-6.19.0-2D3748?style=flat&logo=prisma)
 
-## ✨ Features
+## Features
 
-### 🔐 Authentication & User Management
+### Authentication & User Management
 
 - **Secure Authentication** with Supabase Auth
 - **User Profiles** with customizable avatars
@@ -18,7 +18,7 @@
 - **Account Deletion** with team ownership transfer
 - **Admin Panel** for user and team management
 
-### 📊 Task Management
+### Task Management
 
 - **Personal Tasks** with due dates and categories
 - **Team Task Assignment** for collaborative work
@@ -27,7 +27,7 @@
 - **Calendar View** for visualizing deadlines
 - **Inbox Panel** for quick task overview
 
-### 👥 Team Collaboration
+### Team Collaboration
 
 - **Create & Manage Teams** with role-based access
 - **Team Invitations** via email
@@ -35,7 +35,7 @@
 - **Team Task Delegation** by owners/admins
 - **Real-time Notifications** for team activities
 
-### 📝 Additional Features
+### Additional Features
 
 - **Notes System** for personal note-taking
 - **Notifications** with real-time updates
@@ -43,7 +43,7 @@
 - **Responsive Design** with modern white theme
 - **Row-Level Security (RLS)** for data protection
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -71,7 +71,7 @@
 └─────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 Tech Stack
+## Tech Stack
 
 | Category             | Technology                  |
 | -------------------- | --------------------------- |
@@ -87,7 +87,7 @@
 | **Date Utils** | date-fns 4.1.0              |
 | **Deployment** | Vercel                      |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 task-manager/
@@ -127,7 +127,7 @@ task-manager/
 └── package.json                 # Dependencies
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -200,7 +200,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## ⚙️ Setup Instructions
+## Setup Instructions
 
 ### 1. Clone the repository
 
@@ -248,7 +248,7 @@ Quick steps:
 2. Run `prisma/fix-uuid-defaults.sql` in Supabase SQL Editor
 3. Run `prisma/enable-rls.sql` in Supabase SQL Editor
 
-**📖 [Full Database Setup Guide](./DATABASE_SETUP.md)**
+** [Full Database Setup Guide](./DATABASE_SETUP.md)**
 
 ### 6. Generate Prisma Client
 
@@ -256,7 +256,7 @@ Quick steps:
 npx prisma generate
 ```
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Core Tables
 
@@ -352,7 +352,7 @@ npx prisma generate
 
 See [`DATABASE.md`](./DATABASE.md) for complete RLS policies and setup instructions.
 
-## 🔒 Security Features
+## Security Features
 
 ### Row-Level Security (RLS)
 
@@ -393,7 +393,7 @@ All tables use Supabase RLS policies:
 - **Calendar** - Visual task timeline
 - **Forms** - Validated inputs with real-time feedback
 
-## 📡 API Routes
+## API Routes
 
 ### User Management
 
@@ -419,11 +419,11 @@ PUT    /api/tasks/:id         # Update task
 DELETE /api/tasks/:id         # Delete task
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Deploy to Vercel
 
-[![Deploy](https://img.shields.io/badge/▲_Deploy-black?style=for-the-badge)](https://task-manager-pi-weld.vercel.app)
+[![Deploy](https://img.shields.io/badge/▲_Deploy-black?style=for-the-badge)](https://www.vela.works/)
 
 #### Manual Deployment
 
@@ -462,7 +462,7 @@ Add these in **Settings → Environment Variables**:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `ADMIN_EMAILS`
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run development server
@@ -478,7 +478,7 @@ npm start
 npm run lint
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -488,7 +488,7 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 License
+## License
 
 This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
 
@@ -496,9 +496,9 @@ This program is free software: you can redistribute it and/or modify it under th
 
 See [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 Author
+## Author
 
-**Mykhailo Chupryna**
+**Mykhailo Khimich**
 
 - GitHub: [@1curafu](https://github.com/1curafu)
 - Repository: [Task-Manager](https://github.com/1curafu/Task-Manager)
