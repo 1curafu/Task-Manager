@@ -34,6 +34,10 @@ export const metadata: Metadata = {
     title: "Vela - Set your sails",
     description: "A modern team collaboration and task management platform",
   },
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/vela_updated.png',
+  },
 };
 
 export default function RootLayout({
