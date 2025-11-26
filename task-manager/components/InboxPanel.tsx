@@ -44,7 +44,27 @@ export default function InboxPanel({ userId, onClose }: { userId: string; onClos
 
   useEffect(() => {
     loadNotifications()
-  }, [loadNotifications])
+
+    const channel = supabase
+      .channel('inbox-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'Notification',
+          filter: `userId=eq.${userId}`
+        },
+        () => {
+          loadNotifications()
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [loadNotifications, supabase, userId])
 
   const markAsRead = async (notificationId: string) => {
     try {
@@ -144,7 +164,7 @@ export default function InboxPanel({ userId, onClose }: { userId: string; onClos
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'invite':
+      case 'team_invite':
         return '👥'
       case 'task_assigned':
         return '📋'

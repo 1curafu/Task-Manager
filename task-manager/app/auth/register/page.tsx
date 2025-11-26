@@ -317,7 +317,7 @@ export default function RegisterPage() {
     <div className="auth-overlay">
       <div className="auth-modal">
         <div className="auth-logo-container">
-          <Image src="/vela_updated.png" alt="Vela" width={120} height={120} className="auth-logo" priority />
+          <Image src="/favicon.ico" alt="Vela" width={64} height={64} className="mx-auto mb-4" priority />
         </div>
         <h1 className="auth-title">
           Vela
@@ -456,6 +456,53 @@ export default function RegisterPage() {
             {loading ? 'Creating account...' : 'Register'}
           </button>
         </form>
+
+        {/*<div className="auth-divider">
+          <span>Or continue with</span>
+        </div>
+
+        <div className="social-login-buttons">
+          <button 
+            className="btn-social"
+            onClick={() => supabase.auth.signInWithOAuth({ 
+              provider: 'google',
+              options: {
+                redirectTo: `${window.location.origin}/auth/callback`
+              }
+            })}
+            type="button"
+          >
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="social-icon" />
+            Sign in with Google
+          </button>
+          <button 
+            className="btn-social"
+            onClick={() => supabase.auth.signInWithOAuth({ 
+              provider: 'apple',
+              options: {
+                redirectTo: `${window.location.origin}/auth/callback`
+              }
+            })}
+            type="button"
+          >
+            <img src="https://www.svgrepo.com/show/511330/apple-173.svg" alt="Apple" className="social-icon" style={{ filter: 'var(--icon-filter)' }} />
+            Sign in with Apple
+          </button>
+          <button 
+            className="btn-social"
+            onClick={() => supabase.auth.signInWithOAuth({ 
+              provider: 'github',
+              options: {
+                redirectTo: `${window.location.origin}/auth/callback`
+              }
+            })}
+            type="button"
+          >
+            <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="GitHub" className="social-icon" style={{ filter: 'var(--icon-filter)' }} />
+            Sign in with GitHub
+          </button>
+        </div>
+        */}
 
         <div className="auth-link-container">
           <span className="auth-link-text">Already have an account? </span>

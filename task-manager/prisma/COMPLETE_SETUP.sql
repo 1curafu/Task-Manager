@@ -395,7 +395,205 @@ TO public
 USING (bucket_id = 'avatars');
 
 -- =====================================================
--- STEP 10: VERIFICATION QUERIES
+-- STEP 10: TEAM MANAGEMENT FUNCTIONS
+-- =====================================================
+-- Function to invite team members with automatic notifications
+
+-- Drop any existing versions of the function
+DROP FUNCTION IF EXISTS invite_team_member(text, text, text, text, text);
+DROP FUNCTION IF EXISTS invite_team_member(uuid, uuid, text, text, uuid);
+
+CREATE OR REPLACE FUNCTION invite_team_member(
+  team_id_param UUID,
+  user_id_param UUID,
+  invite_email_param TEXT,
+  invite_role_param TEXT,
+  invited_by_param UUID
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  target_user_id UUID;
+  target_team_name TEXT;
+  new_member_id UUID;
+  inviter_name TEXT;
+  normalized_email TEXT;
+BEGIN
+  normalized_email := LOWER(TRIM(invite_email_param));
+
+  -- Check permissions (must be owner or admin)
+  IF NOT EXISTS (
+    SELECT 1 FROM "TeamMember"
+    WHERE "teamId" = team_id_param::text
+    AND "userId" = user_id_param::text
+    AND "role" IN ('owner', 'admin')
+    AND "status" = 'accepted'
+  ) THEN
+    RETURN jsonb_build_object('success', false, 'error', 'Permission denied: You must be an owner or admin to invite members.');
+  END IF;
+
+  -- Get Team Name
+  SELECT name INTO target_team_name FROM "Team" WHERE id = team_id_param::text;
+
+  -- Get Inviter Name
+  SELECT name INTO inviter_name FROM "Profile" WHERE "userId" = user_id_param::text;
+  IF inviter_name IS NULL THEN
+    inviter_name := 'A team member';
+  END IF;
+
+  -- Find the user by email (Case Insensitive)
+  SELECT id INTO target_user_id FROM auth.users WHERE LOWER(email) = normalized_email;
+
+  -- Check if already a member
+  IF EXISTS (
+    SELECT 1 FROM "TeamMember"
+    WHERE "teamId" = team_id_param::text
+    AND LOWER("userEmail") = normalized_email
+  ) THEN
+    RETURN jsonb_build_object('success', false, 'error', 'User is already a member or has a pending invite.');
+  END IF;
+
+  -- Insert TeamMember
+  INSERT INTO "TeamMember" (
+    "teamId",
+    "userId",
+    "userEmail",
+    "role",
+    "status",
+    "invitedBy",
+    "invitedAt"
+  ) VALUES (
+    team_id_param::text,
+    target_user_id::text,
+    normalized_email,
+    invite_role_param,
+    'pending',
+    invited_by_param::text,
+    NOW()
+  ) RETURNING id INTO new_member_id;
+
+  -- Create Notification (ONLY if user exists)
+  IF target_user_id IS NOT NULL THEN
+    INSERT INTO "Notification" (
+      "userId",
+      "type",
+      "title",
+      "message",
+      "isRead",
+      "link",
+      "createdAt"
+    ) VALUES (
+      target_user_id::text,
+      'team_invite',
+      'Team Invitation',
+      inviter_name || ' invited you to join ' || target_team_name,
+      false,
+      '/dashboard?acceptInvite=' || new_member_id::text,
+      NOW()
+    );
+  END IF;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'member_id', new_member_id,
+    'user_found', (target_user_id IS NOT NULL),
+    'debug_email', normalized_email
+  );
+EXCEPTION WHEN OTHERS THEN
+  RETURN jsonb_build_object('success', false, 'error', SQLERRM);
+END;
+$$;
+
+COMMENT ON FUNCTION invite_team_member IS 'Invite a user to join a team and automatically create a notification if the user exists';
+
+-- =====================================================
+-- STEP 11: AUTOMATIC NOTIFICATION TRIGGERS
+-- =====================================================
+-- Trigger to create notifications when tasks are assigned
+
+CREATE OR REPLACE FUNCTION notify_task_assignment()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- CASE 1: New Task Created
+  IF (TG_OP = 'INSERT') THEN
+    IF (NEW."assignedToId" IS NOT NULL AND NEW."assignedToId" != NEW."createdById") THEN
+      INSERT INTO "Notification" ("userId", "type", "title", "message", "isRead", "createdAt")
+      VALUES (
+        NEW."assignedToId",
+        'task_assigned',
+        'New Task Assignment',
+        'You have been assigned to task: ' || NEW.name,
+        false,
+        NOW()
+      );
+    END IF;
+  
+  -- CASE 2: Task Updated
+  ELSIF (TG_OP = 'UPDATE') THEN
+    IF (NEW."assignedToId" IS NOT NULL AND 
+       (OLD."assignedToId" IS NULL OR NEW."assignedToId" != OLD."assignedToId") AND 
+       NEW."assignedToId" != NEW."createdById") THEN
+       
+      INSERT INTO "Notification" ("userId", "type", "title", "message", "isRead", "createdAt")
+      VALUES (
+        NEW."assignedToId",
+        'task_assigned',
+        'New Task Assignment',
+        'You have been assigned to task: ' || NEW.name,
+        false,
+        NOW()
+      );
+    END IF;
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_task_assigned ON "Task";
+CREATE TRIGGER on_task_assigned
+AFTER INSERT OR UPDATE ON "Task"
+FOR EACH ROW
+EXECUTE FUNCTION notify_task_assignment();
+
+COMMENT ON FUNCTION notify_task_assignment IS 'Automatically create notifications when tasks are assigned to users';
+
+-- =====================================================
+-- STEP 12: ENABLE REALTIME SUBSCRIPTIONS
+-- =====================================================
+-- Add tables to the realtime publication for live updates
+
+DO $$
+BEGIN
+  -- Add Task to realtime
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE "Task";
+    RAISE NOTICE 'Added Task to realtime';
+  EXCEPTION WHEN duplicate_object THEN
+    RAISE NOTICE 'Task already in realtime';
+  END;
+
+  -- Add Notification to realtime
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE "Notification";
+    RAISE NOTICE 'Added Notification to realtime';
+  EXCEPTION WHEN duplicate_object THEN
+    RAISE NOTICE 'Notification already in realtime';
+  END;
+
+  -- Add TeamMember to realtime
+  BEGIN
+    ALTER PUBLICATION supabase_realtime ADD TABLE "TeamMember";
+    RAISE NOTICE 'Added TeamMember to realtime';
+  EXCEPTION WHEN duplicate_object THEN
+    RAISE NOTICE 'TeamMember already in realtime';
+  END;
+END $$;
+
+-- =====================================================
+-- STEP 13: VERIFICATION QUERIES
 -- =====================================================
 
 -- Verify RLS is enabled on all tables

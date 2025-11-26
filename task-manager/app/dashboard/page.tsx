@@ -125,9 +125,77 @@ export default function DashboardPage() {
       loadTasks()
       loadUnreadCount()
       checkPendingInvites()
+
+      const channel = supabase
+        .channel('realtime-notifications')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'Notification',
+            filter: `userId=eq.${userId}`
+          },
+          (payload) => {
+            console.log('🔔 NOTIFICATION EVENT RECEIVED:', payload)
+            loadUnreadCount()
+          }
+        )
+        .subscribe((status) => {
+          console.log('Realtime Notifications Status:', status)
+        })
+
+      const taskChannel = supabase
+        .channel('realtime-tasks')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'Task'
+          },
+          async (payload) => {
+            console.log('📋 TASK EVENT RECEIVED:', payload)
+            loadTasks()
+
+            if (payload.eventType === 'INSERT' && payload.new) {
+              const newTask = payload.new as Task
+              if (newTask.assignedToId === userId && newTask.createdById !== userId) {
+              }
+            }
+          }
+        )
+        .subscribe((status) => {
+          console.log('Realtime Tasks Status:', status)
+        })
+
+      const inviteChannel = supabase
+        .channel('realtime-invites')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'TeamMember',
+            filter: `userEmail=eq.${userEmail}`
+          },
+          (payload) => {
+            console.log('👥 INVITE EVENT RECEIVED:', payload)
+            checkPendingInvites()
+          }
+        )
+        .subscribe((status) => {
+          console.log('Realtime Invites Status:', status)
+        })
+
+      return () => {
+        supabase.removeChannel(channel)
+        supabase.removeChannel(taskChannel)
+        supabase.removeChannel(inviteChannel)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId])
+  }, [userId, userEmail])
 
   const checkPendingInvites = async () => {
     if (!userId || !userEmail) {
@@ -282,7 +350,7 @@ export default function DashboardPage() {
     <>
       <nav className="top-navbar">
         <div className="navbar-branding">
-          <Image src="/vela_updated.png" alt="Vela" width={36} height={36} className="navbar-logo" />
+          <Image src="/favicon.ico" alt="Vela" width={36} height={36} className="navbar-logo" />
           <h1 className="navbar-title">Vela</h1>
         </div>
         <div className="navbar-menu">

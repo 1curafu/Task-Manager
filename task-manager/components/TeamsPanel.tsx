@@ -468,19 +468,15 @@ function TeamDetailsContent({ teamId, userId, onUpdate }: {
           invited_by_param: userId
         })
 
+      console.log('Invite RPC Response:', { data, inviteError })
+
       if (inviteError) {
-        if (inviteError.message.includes('Permission denied')) {
-          setError('Only owners and admins can invite members')
-          return
-        } else if (inviteError.message.includes('already a member')) {
-          setError('This user is already a member of the team')
-          return
-        } else if (inviteError.message.includes('already pending')) {
-          setError('An invitation is already pending for this email')
-          return
-        } else {
-          throw inviteError
-        }
+        throw inviteError
+      }
+
+      if (data && data.success === false) {
+        setError(data.error || 'Failed to send invite')
+        return
       }
       
       setInviteEmail('')
