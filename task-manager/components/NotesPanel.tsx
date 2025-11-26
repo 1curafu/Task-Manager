@@ -202,7 +202,7 @@ function NotesModal({
           throw new Error(`Database error: ${error.message} (Code: ${error.code})`)
         }
         
-        console.log('Note created successfully:', data)
+
       }
 
       await onUpdate()

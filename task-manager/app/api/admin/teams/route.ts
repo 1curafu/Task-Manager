@@ -40,17 +40,17 @@ async function isUserAdmin(): Promise<boolean> {
 
 export async function GET() {
   try {
-    console.log('GET /api/admin/teams called')
+
     
     const isAdmin = await isUserAdmin()
-    console.log('Admin check result:', isAdmin)
+
     
     if (!isAdmin) {
-      console.log('User is not admin, returning 403')
+
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    console.log('Querying teams...')
+
     const { data: teams, error: teamsError } = await supabaseAdmin
       .from('Team')
       .select('*')
@@ -75,7 +75,7 @@ export async function GET() {
       })
     )
 
-    console.log('Returning teams:', teamsWithMembers.length)
+
     return NextResponse.json({ teams: teamsWithMembers }, { status: 200 })
   } catch (error) {
     console.error('Caught exception in GET /api/admin/teams:', error)
