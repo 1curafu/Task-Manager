@@ -33,7 +33,7 @@
   mask-image: radial-gradient(circle at center, black, transparent 80%);
 }
 
-[data-theme='dark'] .heroBgGrid {
+:root[class~="dark"] .heroBgGrid {
   background-image: linear-gradient(var(--gray-800) 1px, transparent 1px),
     linear-gradient(90deg, var(--gray-800) 1px, transparent 0.5px);
 }
@@ -103,8 +103,8 @@
   font-size: 1.05rem;
 }
 
-[data-theme='dark'] .content p {
-  color: var(--gray-400);
+:root[class~="dark"] .content p {
+  color: var(--gray-300);
 }
 
 .content ul {
@@ -115,11 +115,12 @@
 .content li {
   margin-bottom: 0.75rem;
   color: var(--gray-600);
+  line-height: 1.8;
   font-size: 1.05rem;
 }
 
-[data-theme='dark'] .content li {
-  color: var(--gray-400);
+:root[class~="dark"] .content li {
+  color: var(--gray-300);
 }
 
 .content a {

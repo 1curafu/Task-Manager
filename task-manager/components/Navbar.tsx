@@ -20,11 +20,19 @@ export function Navbar() {
         <div 
           className={styles.logo} 
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+          }}
         >
           <div className={styles.logoIcon}>
             <Image src="/apple-touch-icon.png" alt="Vela Works Logo" width={32} height={32} />
           </div>
-          <Link href="/" className={styles.logoText} style={{textDecoration: 'none', color: 'inherit'}}>Vela Works</Link>
+          <Link href="/" className={styles.logoText}>Vela Works</Link>
         </div>
         <div className={styles.navLinks}>
           <Link href="/#features">Features</Link>
@@ -55,6 +63,8 @@ export function Navbar() {
         <button 
           className={styles.mobileMenuBtn}
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMobileMenuOpen}
         >
           <ListBulletsIcon />
         </button>
