@@ -1,30 +1,27 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabaseClient'
-import { ThemeToggle } from '@/components/ThemeToggle'
+import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 import styles from './page.module.css'
 import { 
-  Code, 
-  List, 
-  ArrowRight, 
-  UsersThree, 
-  ShieldCheck, 
-  CheckSquare, 
-  Bell, 
-  Calendar, 
-  Gear, 
-  Lightning, 
-  Database, 
-  LockKey, 
-  Desktop, 
-  GithubLogo 
+  CodeIcon, 
+  ArrowRightIcon, 
+  UsersThreeIcon, 
+  ShieldCheckIcon, 
+  CheckSquareIcon, 
+  BellIcon, 
+  CalendarIcon, 
+  GearIcon, 
+  LightningIcon, 
+  DatabaseIcon, 
+  LockKeyIcon, 
+  DesktopIcon
 } from '@phosphor-icons/react'
 
 export default function Landing() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -41,65 +38,7 @@ export default function Landing() {
   return (
     <div className={styles.container}>
       
-      <nav className={styles.navbar}>
-        <div className={styles.navContent}>
-          <div 
-            className={styles.logo} 
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          >
-            <div className={styles.logoIcon}>
-              <Image src="/apple-touch-icon.png" alt="Vela Works Logo" width={32} height={32} />
-            </div>
-            <span className={styles.logoText}>Vela Works</span>
-          </div>
-          <div className={styles.navLinks}>
-            <Link href="#features">Features</Link>
-            <Link href="#speed">Performance</Link>
-            <Link href="#security">Security</Link>
-            
-            <div className={styles.navActions}>
-              <ThemeToggle />
-              
-              <a 
-                href="https://github.com/1curafu/Task-Manager" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={styles.navBtnGithub}
-              >
-                <Code weight="bold" size={18} />
-                <span>Source</span>
-              </a>
-              <Link 
-                href="/auth/login"
-                className={styles.navBtnLogin}
-              >
-                Login
-                <ArrowRight weight="bold" />
-              </Link>
-            </div>
-          </div>
-          <button 
-            className={styles.mobileMenuBtn}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <List />
-          </button>
-        </div>
-        {isMobileMenuOpen && (
-          <div className={styles.mobileMenu}>
-            <Link href="#features" onClick={() => setIsMobileMenuOpen(false)}>Features</Link>
-            <Link href="#speed" onClick={() => setIsMobileMenuOpen(false)}>Performance</Link>
-            <Link href="#security" onClick={() => setIsMobileMenuOpen(false)}>Security</Link>
-            <div className={styles.mobileMenuDivider}></div>
-            <div className={styles.mobileMenuRow}>
-              <span className={styles.mobileMenuLabel}>Theme</span>
-              <ThemeToggle />
-            </div>
-            <Link href="/auth/login" className={`${styles.navBtnLogin} ${styles.mobileMenuBtnFull}`} onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
-            <a href="https://github.com/1curafu/Task-Manager" target="_blank" rel="noopener noreferrer" className={`${styles.navBtnGithub} ${styles.mobileMenuBtnFull}`} onClick={() => setIsMobileMenuOpen(false)}>View Source Code</a>
-          </div>
-        )}
-      </nav>
+      <Navbar />
 
       <section className={styles.hero}>
         <div className={styles.heroBgGrid}></div>
@@ -122,11 +61,11 @@ export default function Landing() {
           <div className={styles.heroActions}>
             <Link href="/auth/login" className={`${styles.btn} ${styles.btnPrimary}`}>
               Start Organizing
-              <ArrowRight weight="bold" />
+              <ArrowRightIcon weight="bold" />
             </Link>
             <a href="https://github.com/1curafu/Task-Manager" target="_blank" rel="noopener noreferrer" className={`${styles.btn} ${styles.btnSecondary}`}>
               View Technical Details
-              <Code weight="bold" />
+              <CodeIcon weight="bold" />
             </a>
           </div>
           <div className={styles.mockupContainer}>
@@ -186,37 +125,37 @@ export default function Landing() {
           <div className={styles.featuresGrid}>
             {[
               { 
-                icon: <UsersThree weight="fill" />, 
+                icon: <UsersThreeIcon weight="fill" />, 
                 title: "Work Together Seamlessly", 
                 desc: "Invite your team via email and start collaborating instantly. Assign roles, delegate tasks, and keep everyone on the same page.",
                 bgClass: styles.bgBlueLight
               },
               { 
-                icon: <ShieldCheck weight="fill" />, 
+                icon: <ShieldCheckIcon weight="fill" />, 
                 title: "Enterprise-Grade Security", 
                 desc: "Your data is protected by industry-standard encryption and strict access controls. Only the right people see your information.",
                 bgClass: styles.bgPurpleLight
               },
               { 
-                icon: <CheckSquare weight="fill" />, 
+                icon: <CheckSquareIcon weight="fill" />, 
                 title: "Stay on Track", 
                 desc: "Never miss a deadline. Organize tasks by category, set due dates, and mark progress with a single click.",
                 bgClass: styles.bgGreenLight
               },
               { 
-                icon: <Bell weight="fill" />, 
+                icon: <BellIcon weight="fill" />, 
                 title: "Instant Notifications", 
                 desc: "Get alerted the moment a task is assigned to you or a project status updates. Stay in the loop without checking email.",
                 bgClass: styles.bgOrangeLight
               },
               { 
-                icon: <Calendar weight="fill" />, 
+                icon: <CalendarIcon weight="fill" />, 
                 title: "Visual Calendar", 
                 desc: "See your week at a glance. Switch to calendar view to visualize bottlenecks and plan your upcoming sprints effectively.",
                 bgClass: styles.bgRedLight
               },
               { 
-                icon: <Gear weight="fill" />, 
+                icon: <GearIcon weight="fill" />, 
                 title: "Powerful Administration", 
                 desc: "Team owners have full control. Manage user access, oversee multiple teams, and audit activity from a dedicated panel.",
                 bgClass: styles.bgIndigoLight
@@ -246,9 +185,9 @@ export default function Landing() {
               
               <ul className={styles.stackList}>
                 {[
-                  { icon: <Lightning weight="fill" />, title: "Lightning Fast Loads", desc: "Powered by Next.js, pages load instantly so you never wait to add a task." },
-                  { icon: <Database weight="fill" />, title: "Real-Time Sync", desc: "Your data syncs across devices instantly via Supabase's realtime engine." },
-                  { icon: <LockKey weight="fill" />, title: "Secure by Design", desc: "Strict type-checking ensures the application is robust and bug-free." }
+                  { icon: <LightningIcon weight="fill" />, title: "Lightning Fast Loads", desc: "Powered by Next.js, pages load instantly so you never wait to add a task." },
+                  { icon: <DatabaseIcon weight="fill" />, title: "Real-Time Sync", desc: "Your data syncs across devices instantly via Supabase's realtime engine." },
+                  { icon: <LockKeyIcon weight="fill" />, title: "Secure by Design", desc: "Strict type-checking ensures the application is robust and bug-free." }
                 ].map((item, i) => (
                   <li key={i} className={styles.stackItem}>
                     {item.icon}
@@ -261,7 +200,7 @@ export default function Landing() {
               </ul>
               <div className={styles.linkActionContainer}>
                 <a href="https://github.com/1curafu/Task-Manager" target="_blank" rel="noopener noreferrer" className={styles.linkAction}>
-                  For Developers: View the Code <ArrowRight weight="bold" />
+                  For Developers: View the Code <ArrowRightIcon weight="bold" />
                 </a>
               </div>
             </div>
@@ -303,7 +242,7 @@ export default function Landing() {
               
               <div className={styles.flowNode}>
                 <div className={`${styles.nodeIcon} ${styles.client}`}>
-                  <Desktop weight="duotone" />
+                  <DesktopIcon weight="duotone" />
                 </div>
                 <h3 className={styles.nodeTitle}>Your Device</h3>
                 <p className={styles.nodeDesc}>Secure Connection (SSL)</p>
@@ -317,7 +256,7 @@ export default function Landing() {
               {/* Server */}
               <div className={styles.flowNode}>
                 <div className={`${styles.nodeIcon} ${styles.server}`}>
-                  <ShieldCheck weight="duotone" />
+                  <ShieldCheckIcon weight="duotone" />
                 </div>
                 <h3 className={styles.nodeTitle}>Secure Validation</h3>
                 <p className={styles.nodeDesc}>Identity Check</p>
@@ -330,7 +269,7 @@ export default function Landing() {
               </div>
               <div className={styles.flowNode}>
                 <div className={`${styles.nodeIcon} ${styles.db}`}>
-                  <LockKey weight="duotone" />
+                  <LockKeyIcon weight="duotone" />
                 </div>
                 <h3 className={styles.nodeTitle}>Protected Storage</h3>
                 <p className={styles.nodeDesc}>Encrypted Database</p>
@@ -340,32 +279,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className={styles.footer}>
-        <div className={styles.mainContainer}>
-          <div className={styles.footerContent}>
-            <div className={styles.logo}>
-              <div className={styles.logoIcon}>
-                <Image src="/apple-touch-icon.png" alt="Vela Works Logo" width={32} height={32} />
-              </div>
-              <span className={styles.logoText}>Vela Works</span>
-            </div>
-            
-            <div className={styles.footerSocial}>
-              <a href="https://github.com/1curafu" target="_blank" rel="noopener noreferrer" className={styles.footerSocialLink}>
-                <GithubLogo weight="fill" />
-              </a>
-            </div>
-          </div>
-          
-          <div className={styles.footerBottom}>
-            <p>© 2025 Vela Works. All rights reserved.</p>
-            <div className={styles.footerLinks}>
-              <a href="#" className={styles.footerLink}>Privacy Policy</a>
-              <a href="#" className={styles.footerLink}>Terms of Service</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

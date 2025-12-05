@@ -1,0 +1,208 @@
+.navbar {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 1.5rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.7);
+  border-bottom: 1px solid var(--gray-200);
+  transition: all 0.3s ease;
+}
+
+:root[class~="dark"] .navbar {
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.navContent {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.logoText {
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navLinks a {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--gray-600);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.navLinks a:hover {
+  color: var(--color-brand-blue);
+}
+
+:root[class~="dark"] .navLinks a {
+  color: var(--gray-400);
+}
+
+:root[class~="dark"] .navLinks a:hover {
+  color: var(--color-blue-400);
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--gray-200);
+}
+
+:root[class~="dark"] .navActions {
+  border-left: 1px solid var(--gray-800);
+}
+
+.navBtnGithub {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gray-700);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.navBtnGithub:hover {
+  color: var(--foreground);
+}
+
+:root[class~="dark"] .navBtnGithub {
+  color: var(--gray-400);
+}
+
+:root[class~="dark"] .navBtnGithub:hover {
+  color: var(--foreground);
+}
+
+.navBtnLogin {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--foreground);
+  color: var(--background);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.navBtnLogin:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+:root[class~="dark"] .navBtnLogin {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.mobileMenuBtn {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--foreground);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--background);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+}
+
+:root[class~="dark"] .mobileMenu {
+  border-bottom: 1px solid var(--gray-800);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
+}
+
+.mobileMenu a {
+  font-size: 1.125rem;
+  color: var(--foreground);
+  text-decoration: none;
+  padding: 0.5rem 0;
+}
+
+.mobileMenuDivider {
+  height: 1px;
+  background: var(--gray-200);
+  margin: 0.5rem 0;
+}
+
+:root[class~="dark"] .mobileMenuDivider {
+  background: var(--gray-800);
+}
+
+.mobileMenuRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mobileMenuLabel {
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
+.mobileMenuBtnFull {
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .navLinks {
+    display: none;
+  }
+
+  .mobileMenuBtn {
+    display: block;
+  }
+}

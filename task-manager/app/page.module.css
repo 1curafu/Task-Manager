@@ -1,8 +1,6 @@
-/* --- CSS Variables & Reset --- */
 .container {
     --font-main: 'Inter', sans-serif;
     
-    /* Color Palette */
     --color-white: #ffffff;
     --color-slate-50: #f8fafc;
     --color-slate-100: #f1f5f9;
@@ -18,7 +16,6 @@
     --color-brand-blue-hover: #1d4ed8;
     --color-purple-600: #9333ea;
     
-    /* Accents */
     --color-blue-50: #eff6ff;
     --color-blue-100: #dbeafe;
     --color-purple-50: #faf5ff;
@@ -39,18 +36,18 @@
     -webkit-font-smoothing: antialiased;
 }
 
-/* Dark Mode Overrides */
+
 :global(.dark) .container {
-    --color-white: #0f172a; /* Invert white to dark slate */
-    --color-slate-50: #020617; /* Darker background */
+    --color-white: #0f172a;
+    --color-slate-50: #020617;
     --color-slate-100: #1e293b;
     --color-slate-200: #334155;
     --color-slate-300: #475569;
     --color-slate-400: #94a3b8;
     --color-slate-500: #cbd5e1;
-    --color-slate-600: #e2e8f0; /* Light text */
-    --color-slate-800: #f8fafc; /* Lighter text */
-    --color-slate-900: #ffffff; /* White text */
+    --color-slate-600: #e2e8f0;
+    --color-slate-800: #f8fafc;
+    --color-slate-900: #ffffff;
 
     --color-blue-50: rgba(37, 99, 235, 0.1);
     --color-blue-100: rgba(37, 99, 235, 0.2);
@@ -88,8 +85,7 @@
 
 .btnPrimary {
     background-color: var(--color-slate-900);
-    color: var(--color-white); /* This might need checking in dark mode since we swapped vars */
-    /* Fix for dark mode text on primary button if vars are swapped */
+    color: var(--color-white);
     color: #ffffff; 
     box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
 }
@@ -119,184 +115,6 @@
     border-color: var(--color-slate-300);
 }
 
-/* --- Navbar --- */
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 64px;
-    background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--color-slate-200);
-    z-index: 1000;
-}
-
-:global(.dark) .navbar {
-    background-color: rgba(15, 23, 42, 0.8);
-}
-
-.navContent {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 100%;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
-
-.logoIcon {
-    width: 32px;
-    height: 32px;
-    background-color: var(--color-slate-900);
-    color: white; /* Always white icon on dark bg */
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-}
-
-:global(.dark) .logoIcon {
-    background-color: var(--color-brand-blue);
-    color: #ffffff;
-}
-
-.logoText {
-    font-weight: 700;
-    font-size: 1.125rem;
-    color: var(--color-slate-900);
-}
-
-.navLinks {
-    display: none; /* Hidden on mobile by default */
-}
-
-.navLinks a {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-slate-600);
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.navLinks a:hover {
-    color: var(--color-brand-blue);
-}
-
-.navActions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding-left: 1rem;
-    border-left: 1px solid var(--color-slate-200);
-}
-
-.navBtnGithub {
-    background-color: var(--color-slate-900);
-    color: white !important;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-:global(.dark) .navBtnGithub {
-    background-color: #1e293b;
-}
-
-.navBtnGithub:hover {
-    background-color: var(--color-slate-800);
-}
-
-.navBtnLogin {
-    background-color: var(--color-brand-blue);
-    color: white !important;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-}
-
-.navBtnLogin:hover {
-    background-color: var(--color-brand-blue-hover);
-}
-
-/* Mobile Menu */
-.mobileMenuBtn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--color-slate-600);
-    cursor: pointer;
-    display: block;
-}
-
-.mobileMenu {
-    display: flex;
-    position: absolute;
-    top: 64px;
-    left: 0;
-    width: 100%;
-    background: var(--color-white);
-    border-bottom: 1px solid var(--color-slate-100);
-    padding: 1rem;
-    flex-direction: column;
-    gap: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-.mobileMenu a {
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    color: var(--color-slate-600);
-    font-weight: 500;
-    text-decoration: none;
-}
-
-.mobileMenu a:hover {
-    background-color: var(--color-slate-50);
-    color: var(--color-brand-blue);
-}
-
-.mobileMenuDivider {
-    height: 1px;
-    background-color: var(--color-slate-100);
-    margin: 0.5rem 0;
-}
-
-.mobileMenuRow {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem;
-}
-
-.mobileMenuLabel {
-    font-weight: 500;
-    color: var(--color-slate-600);
-}
-
-.mobileMenuBtnFull {
-    justify-content: center;
-}
-
-/* --- Hero Section --- */
 .hero {
     position: relative;
     padding-top: 8rem;
@@ -387,7 +205,6 @@
     margin-bottom: 4rem;
 }
 
-/* Browser Mockup */
 .mockupContainer {
     max-width: 1024px;
     margin: 0 auto;
@@ -572,7 +389,6 @@
     color: var(--color-slate-800);
 }
 
-/* --- Features Section --- */
 .featuresSection {
     padding: 6rem 0;
     background: var(--color-white);
@@ -656,7 +472,6 @@
     line-height: 1.6;
 }
 
-/* --- Tech Stack Section --- */
 .stackSection {
     padding: 6rem 0;
     background-color: var(--color-slate-900);
@@ -760,7 +575,6 @@
 .tokenString { color: #86efac; }
 .tokenFunction { color: #60a5fa; }
 
-/* --- Architecture Section --- */
 .archSection {
     padding: 6rem 0;
     background-color: var(--color-slate-50);
@@ -842,64 +656,7 @@
     position: relative;
 }
 
-/* --- Footer --- */
-.footer {
-    background-color: var(--color-white);
-    border-top: 1px solid var(--color-slate-200);
-    padding: 4rem 0 2rem;
-}
-
-.footerContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 3rem;
-    gap: 1rem;
-}
-
-.footerSocial {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.footerSocialLink {
-    color: var(--color-slate-400);
-    font-size: 1.5rem;
-}
-
-.footerBottom {
-    border-top: 1px solid var(--color-slate-100);
-    padding-top: 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    font-size: 0.875rem;
-    color: var(--color-slate-500);
-}
-
-.footerLinks {
-    display: flex;
-    gap: 1.5rem;
-}
-
-.footerLink {
-    color: inherit;
-    text-decoration: none;
-}
-
-/* --- Media Queries --- */
 @media (min-width: 768px) {
-    .navLinks {
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-    }
-
-    .mobileMenuBtn {
-        display: none;
-    }
-
     .hero {
         padding-top: 12rem;
         padding-bottom: 8rem;
@@ -946,11 +703,6 @@
         border-top: 2px solid var(--color-slate-200);
         border-right: 2px solid var(--color-slate-200);
         transform: rotate(45deg);
-    }
-
-    .footerContent, .footerBottom {
-        flex-direction: row;
-        justify-content: space-between;
     }
 
     .uiSidebar {
