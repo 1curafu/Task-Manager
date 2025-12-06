@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://vela.works'),
   title: {
-    default: "Vela - Set your sails",
+    default: "Vela Works - Set your sails",
     template: "%s | Vela"
   },
   description: "A modern team collaboration and task management platform designed to help you organize, track, and manage your work efficiently.",
