@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabaseClient'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ThemeToggle } from '@/components/ThemeToggle'
@@ -13,6 +14,23 @@ import {
 
 export function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const supabase = createClient()
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      setIsAuthenticated(!!session)
+    }
+    
+    checkAuth()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   return (
     <nav className={styles.navbar}>
@@ -52,10 +70,10 @@ export function Navbar() {
               <span>Source</span>
             </a>
             <Link 
-              href="/auth/login"
+              href={isAuthenticated ? "/dashboard" : "/auth/login"}
               className={styles.navBtnLogin}
             >
-              Login
+              {isAuthenticated ? "Dashboard" : "Login"}
               <ArrowRightIcon weight="bold" />
             </Link>
           </div>
@@ -79,7 +97,9 @@ export function Navbar() {
             <span className={styles.mobileMenuLabel}>Theme</span>
             <ThemeToggle />
           </div>
-          <Link href="/auth/login" className={`${styles.navBtnLogin} ${styles.mobileMenuBtnFull}`} onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
+          <Link href={isAuthenticated ? "/dashboard" : "/auth/login"} className={`${styles.navBtnLogin} ${styles.mobileMenuBtnFull}`} onClick={() => setIsMobileMenuOpen(false)}>
+            {isAuthenticated ? "Dashboard" : "Login"}
+          </Link>
           <a href="https://github.com/1curafu/Task-Manager" target="_blank" rel="noopener noreferrer" className={`${styles.navBtnGithub} ${styles.mobileMenuBtnFull}`} onClick={() => setIsMobileMenuOpen(false)}>View Source Code</a>
         </div>
       )}
