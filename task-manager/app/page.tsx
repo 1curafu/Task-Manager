@@ -1,6 +1,5 @@
 'use client'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabaseClient'
 import { Navbar } from '@/components/Navbar'
@@ -22,18 +21,23 @@ import {
 } from '@phosphor-icons/react'
 
 export default function Landing() {
-  const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const supabase = createClient()
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        router.push('/dashboard')
-      }
+      setIsAuthenticated(!!session)
     }
+    
     checkAuth()
-  }, [router, supabase])
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   return (
     <div className={styles.container}>
@@ -59,7 +63,7 @@ export default function Landing() {
             A dedicated workspace designed for your team. Built by <strong>Vela Works</strong> to bring speed, security, and simplicity to your daily workflow.
           </p>
           <div className={styles.heroActions}>
-            <Link href="/auth/login" className={`${styles.btn} ${styles.btnPrimary}`}>
+            <Link href={isAuthenticated ? "/dashboard" : "/auth/login"} className={`${styles.btn} ${styles.btnPrimary}`}>
               Start Organizing
               <ArrowRightIcon weight="bold" />
             </Link>
