@@ -75,7 +75,7 @@
 
 | Category             | Technology                  |
 | -------------------- | --------------------------- |
-| **Framework**  | Next.js 16.0.1 (App Router) |
+| **Framework**  | Next.js 16.0.7 (App Router) |
 | **Language**   | TypeScript 5                |
 | **UI Library** | React 19.2.0                |
 | **Styling**    | CSS                         |
