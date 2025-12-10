@@ -350,7 +350,7 @@ export default function DashboardPage() {
     <>
       <nav className="top-navbar">
         <div className="navbar-branding">
-          <Image src="/favicon.ico" alt="Vela" width={36} height={36} className="navbar-logo" />
+          <Image src="/icon.svg" alt="Vela" width={36} height={36} className="navbar-logo" />
           <h1 className="navbar-title">Vela</h1>
         </div>
         <div className="navbar-menu">
