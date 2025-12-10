@@ -143,7 +143,7 @@ export default function ResetPasswordPage() {
     <div className="auth-overlay">
       <div className="auth-modal">
         <div className="auth-logo-container">
-          <Image src="/favicon.ico" alt="Vela" width={64} height={64} className="mx-auto mb-4" priority />
+          <Image src="/icon.svg" alt="Vela" width={64} height={64} className="mx-auto mb-4" priority />
         </div>
         <h1 className="auth-title">Vela</h1>
         <p className="auth-slogan">Set your sails</p>
