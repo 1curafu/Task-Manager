@@ -10,7 +10,7 @@ export function Footer() {
         <div className={styles.footerContent}>
           <div className={styles.logo}>
             <div className={styles.logoIcon}>
-              <Image src="/apple-touch-icon.png" alt="Vela Works Logo" width={32} height={32} />
+              <Image src="/icon.svg" alt="Vela Works Logo" width={32} height={32} />
             </div>
             <span className={styles.logoText}>Vela Works</span>
           </div>

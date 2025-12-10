@@ -48,7 +48,7 @@ export function Navbar() {
           }}
         >
           <div className={styles.logoIcon}>
-            <Image src="/apple-touch-icon.png" alt="Vela Works Logo" width={32} height={32} />
+            <Image src="/icon.svg" alt="Vela Works Logo" width={32} height={32} />
           </div>
           <Link href="/" className={styles.logoText}>Vela Works</Link>
         </div>
