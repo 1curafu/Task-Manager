@@ -40,7 +40,6 @@ export async function proxy(request: NextRequest) {
 }
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/admin/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-touch-icon.png|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
