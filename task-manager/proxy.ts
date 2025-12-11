@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
   const {
     data: { session },
   } = await supabase.auth.getSession()
-  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (!session && (request.nextUrl.pathname.startsWith('/dashboard') || request.nextUrl.pathname.startsWith('/admin'))) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/auth/login'
     return NextResponse.redirect(redirectUrl)
@@ -41,6 +41,6 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/auth/:path*',
+    '/admin/:path*',
   ],
 }
