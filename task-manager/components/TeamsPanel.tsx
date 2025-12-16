@@ -565,10 +565,9 @@ function TeamDetailsContent({ teamId, userId, onUpdate }: {
         setSuccess('')
 
         try {
-          const { error } = await supabase
-            .from('TeamMember')
-            .delete()
-            .eq('id', myMembership.id)
+          const { error } = await supabase.rpc('leave_team', {
+            team_id_param: teamId
+          })
 
           if (error) throw error
           

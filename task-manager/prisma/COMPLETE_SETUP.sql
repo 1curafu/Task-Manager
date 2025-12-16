@@ -285,6 +285,14 @@ USING (
     )
 );
 
+-- DELETE: Members can leave teams (delete own membership)
+DROP POLICY IF EXISTS "Members can leave team" ON "TeamMember";
+CREATE POLICY "Members can leave team" ON "TeamMember"
+FOR DELETE
+USING (
+    "userId" = auth.uid()::text
+);
+
 -- =====================================================
 -- STEP 7: NOTE RLS POLICIES
 -- =====================================================
@@ -507,6 +515,22 @@ END;
 $$;
 
 COMMENT ON FUNCTION invite_team_member IS 'Invite a user to join a team and automatically create a notification if the user exists';
+
+-- Function for a user to leave a team
+CREATE OR REPLACE FUNCTION leave_team(team_id_param TEXT)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  -- Delete the membership record for the current user and specified team
+  DELETE FROM "TeamMember"
+  WHERE "teamId" = team_id_param
+  AND "userId" = auth.uid()::text;
+END;
+$$;
+
+COMMENT ON FUNCTION leave_team IS 'Allows the authenticated user to leave a specific team';
 
 -- =====================================================
 -- STEP 11: AUTOMATIC NOTIFICATION TRIGGERS
