@@ -103,7 +103,7 @@ export default function DashboardLayout({
                 type: 'team_invite',
                 title: 'Team Invitation',
                 message: `You've been invited to join ${teamName} as ${invite.role}. Click to accept or decline.`,
-                link: `/dashboard?acceptInvite=${invite.id}`, // Maintain V1 link for now, or update to V2 teams page?
+                link: `/dashboard?acceptInvite=${invite.id}`,
               })
           }
         }
