@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabaseClient'
 import TeamInviteModal from './TeamInviteModal'
 import ConfirmModal from './ConfirmModal'
+import { motion, AnimatePresence } from 'framer-motion'
 import './InboxPanel.css'
 
 interface Notification {
@@ -200,8 +201,22 @@ export default function InboxPanel({ userId, onClose }: { userId: string; onClos
   const unreadCount = notifications.filter(n => !n.isRead).length
 
   return (
-    <div className="inbox-overlay" onClick={onClose}>
-      <div className="inbox-modal" onClick={(e) => e.stopPropagation()}>
+    <motion.div 
+      className="inbox-overlay" 
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div 
+        className="inbox-modal" 
+        onClick={(e) => e.stopPropagation()}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      >
         <div className="inbox-header">
           <div>
             <h2 className="inbox-title">Inbox</h2>
@@ -283,17 +298,20 @@ export default function InboxPanel({ userId, onClose }: { userId: string; onClos
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
-      {selectedInviteId && (
-        <TeamInviteModal
-          inviteId={selectedInviteId}
-          userId={userId}
-          onClose={() => setSelectedInviteId(null)}
-          onAccept={handleInviteAccept}
-          onDecline={handleInviteDecline}
-        />
-      )}
+      <AnimatePresence>
+        {selectedInviteId && (
+          <TeamInviteModal
+            key="team-invite"
+            inviteId={selectedInviteId}
+            userId={userId}
+            onClose={() => setSelectedInviteId(null)}
+            onAccept={handleInviteAccept}
+            onDecline={handleInviteDecline}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmModal
         isOpen={showConfirmModal}
@@ -309,6 +327,6 @@ export default function InboxPanel({ userId, onClose }: { userId: string; onClos
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
-    </div>
+    </motion.div>
   )
 }

@@ -62,10 +62,10 @@ $$;
 COMMENT ON FUNCTION set_admin_status IS 'Set or remove admin status for a user by email';
 
 -- =====================================================
--- STEP 3: CREATE PROFILE TABLE
+-- STEP 3: CREATE TABLES & PROFILE
 -- =====================================================
--- This stores user display names and avatars for client-side access
 
+-- 3.1: Create Profile Table
 CREATE TABLE IF NOT EXISTS "Profile" (
   id TEXT PRIMARY KEY DEFAULT (uuid_generate_v4())::text,
   "userId" TEXT NOT NULL UNIQUE,
@@ -76,11 +76,88 @@ CREATE TABLE IF NOT EXISTS "Profile" (
 );
 
 CREATE INDEX IF NOT EXISTS "Profile_userId_idx" ON "Profile"("userId");
-
 COMMENT ON TABLE "Profile" IS 'User profile information for display names and avatars';
-COMMENT ON COLUMN "Profile"."userId" IS 'Foreign key to auth.users.id';
-COMMENT ON COLUMN "Profile".avatar IS 'URL to avatar image in Supabase Storage';
+-- (RLS policies for Profile follow below...)
 
+-- 3.2: Create Task Table
+CREATE TABLE IF NOT EXISTS "Task" (
+  id TEXT PRIMARY KEY DEFAULT (uuid_generate_v4())::text,
+  name TEXT NOT NULL,
+  "dueDate" TIMESTAMP(3) NOT NULL,
+  responsible TEXT,
+  category TEXT,
+  notes TEXT,
+  links TEXT,
+  "userId" TEXT NOT NULL,
+  "lastUpdated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "teamId" TEXT,
+  "assignedToId" TEXT,
+  "createdById" TEXT,
+  "completed" BOOLEAN NOT NULL DEFAULT false,
+  "priority" TEXT DEFAULT 'medium'
+);
+CREATE INDEX IF NOT EXISTS "Task_userId_idx" ON "Task"("userId");
+CREATE INDEX IF NOT EXISTS "Task_dueDate_idx" ON "Task"("dueDate");
+CREATE INDEX IF NOT EXISTS "Task_assignedToId_idx" ON "Task"("assignedToId");
+CREATE INDEX IF NOT EXISTS "Task_teamId_idx" ON "Task"("teamId");
+
+-- 3.3: Create Team Table
+CREATE TABLE IF NOT EXISTS "Team" (
+  id TEXT PRIMARY KEY DEFAULT (uuid_generate_v4())::text,
+  name TEXT NOT NULL,
+  description TEXT,
+  "ownerId" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "Team_ownerId_idx" ON "Team"("ownerId");
+
+-- 3.4: Create TeamMember Table
+CREATE TABLE IF NOT EXISTS "TeamMember" (
+  id TEXT PRIMARY KEY DEFAULT (uuid_generate_v4())::text,
+  "teamId" TEXT NOT NULL,
+  "userId" TEXT,
+  "userEmail" TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'member',
+  status TEXT NOT NULL DEFAULT 'pending',
+  "invitedBy" TEXT NOT NULL,
+  "invitedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "respondedAt" TIMESTAMP(3)
+);
+CREATE INDEX IF NOT EXISTS "TeamMember_teamId_idx" ON "TeamMember"("teamId");
+CREATE INDEX IF NOT EXISTS "TeamMember_userId_idx" ON "TeamMember"("userId");
+CREATE INDEX IF NOT EXISTS "TeamMember_status_idx" ON "TeamMember"("status");
+-- Note: Prisma enforces unique constraint, we can add it optionally but RLS handles logic
+-- CREATE UNIQUE INDEX IF NOT EXISTS "TeamMember_teamId_userId_unique" ON "TeamMember"("teamId", "userId");
+
+-- 3.5: Create Note Table
+CREATE TABLE IF NOT EXISTS "Note" (
+  id TEXT PRIMARY KEY DEFAULT (uuid_generate_v4())::text,
+  content TEXT NOT NULL,
+  "userId" TEXT NOT NULL,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updatedAt" TIMESTAMP(3) NOT NULL
+);
+CREATE INDEX IF NOT EXISTS "Note_userId_idx" ON "Note"("userId");
+
+-- 3.6: Create Notification Table
+CREATE TABLE IF NOT EXISTS "Notification" (
+  id TEXT PRIMARY KEY DEFAULT (uuid_generate_v4())::text,
+  "userId" TEXT NOT NULL,
+  type TEXT NOT NULL,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  "isRead" BOOLEAN NOT NULL DEFAULT false,
+  link TEXT,
+  "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS "Notification_userId_idx" ON "Notification"("userId");
+CREATE INDEX IF NOT EXISTS "Notification_isRead_idx" ON "Notification"("isRead");
+
+-- =====================================================
+-- STEP 4: PROFILE RLS
+-- =====================================================
 -- Enable Row-Level Security on Profile
 ALTER TABLE "Profile" ENABLE ROW LEVEL SECURITY;
 
@@ -111,7 +188,7 @@ USING (is_admin(auth.uid()))
 WITH CHECK (is_admin(auth.uid()));
 
 -- =====================================================
--- STEP 4: TASK RLS POLICIES
+-- STEP 5: TASK RLS POLICIES
 -- =====================================================
 -- Tasks support both personal and team collaboration
 
@@ -202,7 +279,8 @@ DROP POLICY IF EXISTS "Users can view their teams" ON "Team";
 CREATE POLICY "Users can view their teams" ON "Team"
 FOR SELECT
 USING (
-    EXISTS (
+    "ownerId" = auth.uid()::text
+    OR EXISTS (
         SELECT 1 FROM "TeamMember" tm
         WHERE tm."teamId" = "Team".id
         AND tm."userId" = auth.uid()::text
@@ -236,32 +314,54 @@ USING ("ownerId" = auth.uid()::text);
 ALTER TABLE "TeamMember" ENABLE ROW LEVEL SECURITY;
 
 -- SELECT: View members of teams you belong to
+-- Helper function to avoid recursion
+CREATE OR REPLACE FUNCTION check_is_team_member(team_id_check text, user_id_check text)
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+STABLE
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM "TeamMember"
+    WHERE "teamId" = team_id_check
+    AND "userId" = user_id_check
+    AND "status" = 'accepted'
+  );
+$$;
+
+-- SELECT: View members of teams you belong to
 DROP POLICY IF EXISTS "Users can view team members" ON "TeamMember";
 CREATE POLICY "Users can view team members" ON "TeamMember"
 FOR SELECT
 USING (
     -- You can see yourself
     "userId" = auth.uid()::text
-    -- You can see members of teams you're in
-    OR EXISTS (
-        SELECT 1 FROM "TeamMember" tm
-        WHERE tm."teamId" = "TeamMember"."teamId"
-        AND tm."userId" = auth.uid()::text
-        AND tm."status" = 'accepted'
-    )
+    -- OR you are a member of the team (checked via secured function)
+    OR check_is_team_member("teamId", auth.uid()::text)
 );
 
 -- INSERT: Owners and admins can invite new members
+-- INSERT: Owners can invite members OR add themselves
 DROP POLICY IF EXISTS "Owners and admins can invite members" ON "TeamMember";
 CREATE POLICY "Owners and admins can invite members" ON "TeamMember"
 FOR INSERT
 WITH CHECK (
+    -- Case 1: Existing Admin/Owner inviting someone
     EXISTS (
         SELECT 1 FROM "TeamMember" tm
         WHERE tm."teamId" = "TeamMember"."teamId"
         AND tm."userId" = auth.uid()::text
         AND tm."role" IN ('owner', 'admin')
         AND tm."status" = 'accepted'
+    )
+    -- Case 2: Team Owner adding themselves (First member)
+    OR (
+       "userId" = auth.uid()::text
+       AND EXISTS (
+          SELECT 1 FROM "Team"
+          WHERE id = "TeamMember"."teamId"
+          AND "ownerId" = auth.uid()::text
+       )
     )
 );
 
@@ -405,6 +505,34 @@ USING (bucket_id = 'avatars');
 -- =====================================================
 -- STEP 10: TEAM MANAGEMENT FUNCTIONS
 -- =====================================================
+
+-- RPC to get teams a user is a member of (used by UI)
+CREATE OR REPLACE FUNCTION get_user_member_teams(user_id_param text)
+RETURNS TABLE (
+  id text,
+  name text,
+  description text,
+  "ownerId" text,
+  role text
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT 
+    t.id, 
+    t.name, 
+    t.description, 
+    t."ownerId", 
+    tm.role
+  FROM "Team" t
+  JOIN "TeamMember" tm ON t.id = tm."teamId"
+  WHERE tm."userId" = user_id_param
+  AND tm."status" = 'accepted';
+END;
+$$;
+
 -- Function to invite team members with automatic notifications
 
 -- Drop any existing versions of the function
