@@ -7,7 +7,7 @@ This project uses a local Supabase instance for development. This ensures you ca
 ### Start the Database
 
 ```bash
-npx supabase start
+npx supabase start -x vector -x logflare
 ```
 
 This spins up Docker containers for Postgres, Auth, Storage, Realtime, etc.

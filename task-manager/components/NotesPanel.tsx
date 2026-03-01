@@ -11,7 +11,7 @@ interface Note {
   updatedAt: string
 }
 
-export default function NotesPanel({ userId }: { userId: string }) {
+export default function NotesPanel({ userId, onClose }: { userId: string; onClose?: () => void }) {
   const [notes, setNotes] = useState<Note[]>([])
   const [loading, setLoading] = useState(true)
   const [showNotesModal, setShowNotesModal] = useState(false)
@@ -44,6 +44,9 @@ export default function NotesPanel({ userId }: { userId: string }) {
       <div className="notes-panel">
         <div className="notes-header">
           <h3 className="notes-title">Notes</h3>
+          {onClose && (
+             <button onClick={onClose} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#666' }}>×</button>
+          )}
         </div>
         <div className="notes-loading">Loading...</div>
       </div>
@@ -60,15 +63,20 @@ export default function NotesPanel({ userId }: { userId: string }) {
       <div className="notes-panel">
         <div className="notes-header">
           <h3 className="notes-title">Notes</h3>
-          <button
-            onClick={() => {
-              setSelectedNoteId(null)
-              setShowNotesModal(true)
-            }}
-            className="btn btn-small btn-primary"
-          >
-            + New
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button
+              onClick={() => {
+                setSelectedNoteId(null)
+                setShowNotesModal(true)
+              }}
+              className="btn btn-small btn-primary"
+            >
+              + New
+            </button>
+            {onClose && (
+               <button onClick={onClose} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#666', lineHeight: 1 }}>×</button>
+            )}
+          </div>
         </div>
         
         <div className="notes-preview">
@@ -187,7 +195,7 @@ function NotesModal({
         }
       } else {
         const now = new Date().toISOString()
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('Note')
           .insert({ 
             content: validatedData.content, 

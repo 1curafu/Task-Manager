@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createBrowserClient } from '@supabase/ssr'
+import { motion } from 'framer-motion'
 import './TeamInviteModal.css'
 
 interface TeamInviteModalProps {
@@ -99,8 +100,22 @@ export default function TeamInviteModal({ inviteId, userId, onClose, onAccept, o
   }
 
   return (
-    <div className="team-invite-overlay" onClick={onClose}>
-      <div className="team-invite-modal" onClick={(e) => e.stopPropagation()}>
+    <motion.div 
+      className="team-invite-overlay" 
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div 
+        className="team-invite-modal" 
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+      >
         {loading ? (
           <div className="team-invite-loading">Loading...</div>
         ) : details ? (
@@ -140,7 +155,7 @@ export default function TeamInviteModal({ inviteId, userId, onClose, onAccept, o
         ) : (
           <div className="team-invite-error">Failed to load invitation details</div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

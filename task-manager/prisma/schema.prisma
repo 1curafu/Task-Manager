@@ -16,6 +16,7 @@ model Task {
   category     String?
   notes        String?
   links        String?
+  priority     String?  @default("medium")
   userId       String
   lastUpdated  DateTime @default(now()) @updatedAt
   createdAt    DateTime @default(now())
@@ -80,4 +81,13 @@ model TeamMember {
   @@index([teamId])
   @@index([userId])
   @@index([status])
+}
+
+model Profile {
+  id        String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  userId    String   @unique
+  name      String?
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 }

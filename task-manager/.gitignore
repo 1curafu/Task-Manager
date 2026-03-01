@@ -49,3 +49,17 @@ next-env.d.ts
 prisma/.env
 prisma/*.db
 prisma/*.db-journal
+
+# AI & Agent Tools
+.agent/
+.agents/
+_agent/
+_agents/
+.next-docs/
+
+# IDE & Editor
+.vscode/
+
+# Supabase Local Data
+supabase/.temp/
+supabase/.branch/
