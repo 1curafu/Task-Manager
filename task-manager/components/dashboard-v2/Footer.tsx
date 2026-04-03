@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { GithubLogo } from '@phosphor-icons/react'
+import { GithubLogo as Github } from '@phosphor-icons/react'
 
 
 export function Footer() {
@@ -29,7 +29,7 @@ export function Footer() {
         <Link href="/privacy-policy" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</Link>
         <Link href="/terms-of-service" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</Link>
         <a href="https://github.com/1curafu" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-          <GithubLogo size={20} weight="fill" />
+          <Github size={20} />
         </a>
       </div>
     </footer>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import styles from '@/app/dashboard-new/dashboard.module.css'
+import styles from '@/app/dashboard/dashboard.module.css'
 
 export function Clock() {
   const [time, setTime] = useState<Date>(new Date())
@@ -25,7 +25,7 @@ export function Clock() {
   return (
     <div className={styles.clockContainer}>
       <div className={styles.clockTime}>
-        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
       </div>
       <div className={styles.clockDate}>
         {time.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}

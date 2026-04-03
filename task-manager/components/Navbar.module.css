@@ -40,6 +40,21 @@
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: var(--color-brand-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+:root[class~="dark"] .logoIcon {
+  background: var(--color-brand-blue);
+}
+
+.navbarLogo {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
 }
 
 .logoText {

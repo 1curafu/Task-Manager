@@ -9,9 +9,7 @@ export function Footer() {
       <div className={styles.mainContainer}>
         <div className={styles.footerContent}>
           <div className={styles.logo}>
-            <div className={styles.logoIcon}>
-              <Image src="/icon.svg" alt="Vela Works Logo" width={32} height={32} />
-            </div>
+            <Image src="/favicon.svg" alt="Vela Works Logo" width={32} height={32} />
             <span className={styles.logoText}>Vela Works</span>
           </div>
           

@@ -94,3 +94,103 @@ export const registerSchema = z.object({
 })
 
 export type RegisterFormData = z.infer<typeof registerSchema>
+
+export const profileUpdateSchema = z.object({
+  email: z.string()
+    .email('Please enter a valid email address')
+    .toLowerCase()
+    .trim()
+    .optional(),
+  password: z.string()
+    .min(6, 'Password must be at least 6 characters')
+    .max(100, 'Password must be less than 100 characters')
+    .optional(),
+  currentPassword: z.string().min(1).optional(),
+  metadata: z.object({
+    name: z.string().max(100).optional(),
+    avatarUrl: z.string().url().optional(),
+  }).strict().optional(),
+}).refine(data => !data.password || !!data.currentPassword, {
+  message: 'Current password is required to set a new password',
+  path: ['currentPassword'],
+})
+
+export type ProfileUpdateData = z.infer<typeof profileUpdateSchema>
+
+export const adminCreateTaskSchema = z.object({
+  name: z.string().min(1).max(200),
+  userId: z.string().uuid(),
+  description: z.string().max(2000).optional(),
+  status: z.enum(['todo', 'in_progress', 'in_review', 'done']).optional(),
+  priority: z.enum(['high', 'medium', 'low']).optional(),
+  dueDate: z.string().optional(),
+  teamId: z.string().uuid().optional(),
+  assignedToId: z.string().uuid().optional(),
+})
+
+export const adminUpdateTaskSchema = z.object({
+  taskId: z.string().uuid(),
+  name: z.string().min(1).max(200).optional(),
+  description: z.string().max(2000).optional(),
+  status: z.enum(['todo', 'in_progress', 'in_review', 'done']).optional(),
+  priority: z.enum(['high', 'medium', 'low']).optional(),
+  dueDate: z.string().optional(),
+  assignedToId: z.string().uuid().optional(),
+  completed: z.boolean().optional(),
+})
+
+export const adminCreateUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6).max(100),
+})
+
+export const adminUpdateUserSchema = z.object({
+  userId: z.string().uuid(),
+  email: z.string().email().optional(),
+  password: z.string().min(6).max(100).optional(),
+  metadata: z.object({ name: z.string().max(100).optional() }).optional(),
+})
+
+export const adminCreateTeamSchema = z.object({
+  name: z.string().min(1).max(100),
+  ownerId: z.string().uuid(),
+  description: z.string().max(500).optional(),
+})
+
+export const adminUpdateTeamSchema = z.object({
+  teamId: z.string().uuid(),
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().max(500).optional(),
+  ownerId: z.string().uuid().optional(),
+})
+
+export const attachmentSchema = z.object({
+  taskId: z.string().uuid(),
+  fileName: z.string().min(1).max(255),
+  fileSize: z.number().int().positive().max(10 * 1024 * 1024), // 10MB
+  mimeType: z.string().min(1),
+})
+
+export type AttachmentData = z.infer<typeof attachmentSchema>
+
+// ── v3 task forms ──────────────────────────────────────────────────────────
+
+export const taskCreateSchema = z.object({
+  name: z.string().min(1, 'Task name is required').max(200).trim(),
+  status: z.enum(['todo', 'in_progress', 'in_review', 'done']).default('todo'),
+  priority: z.enum(['high', 'medium', 'low']).optional(),
+  dueDate: z.string().min(1, 'Due date is required'),
+  assignedToId: z.string().uuid().optional().nullable(),
+  teamId: z.string().uuid().optional().nullable(),
+  notes: z.string().max(2000).optional(),
+  recurrence: z.enum(['daily', 'weekly', 'monthly']).optional().nullable(),
+})
+
+export type TaskCreateFormData = z.infer<typeof taskCreateSchema>
+
+export const taskUpdateSchema = taskCreateSchema.partial().extend({
+  id: z.string().uuid(),
+  completed: z.boolean().optional(),
+})
+
+export type TaskUpdateFormData = z.infer<typeof taskUpdateSchema>

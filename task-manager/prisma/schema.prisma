@@ -24,6 +24,18 @@ model Task {
   assignedToId String?
   createdById  String?
   completed    Boolean  @default(false)
+  orderIndex   Int      @default(0)
+  status       String   @default("todo")
+  recurrence   String?
+  nextRecurrenceDate DateTime?
+  isTemplate   Boolean  @default(false)
+  description  String?
+  projectId    String?
+
+  labels       TaskLabel[]
+  comments     TaskComment[]
+  subtasks     Subtask[]
+  attachments  Attachment[]
 
   @@index([userId])
   @@index([dueDate])
@@ -84,10 +96,114 @@ model TeamMember {
 }
 
 model Profile {
+  id                     String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  userId                 String   @unique
+  name                   String?
+  avatar                 String?
+  bio                    String?
+  avatarUrl              String?
+  hasCompletedOnboarding Boolean  @default(false)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @default(now())
+}
+
+model Label {
+  id        String      @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  name      String
+  color     String      @default("#3b82f6")
+  userId    String
+  createdAt DateTime    @default(now())
+  
+  tasks     TaskLabel[]
+
+  @@index([userId])
+}
+
+model TaskLabel {
+  taskId  String
+  labelId String
+  
+  task    Task  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  label   Label @relation(fields: [labelId], references: [id], onDelete: Cascade)
+
+  @@id([taskId, labelId])
+  @@index([taskId])
+  @@index([labelId])
+}
+
+model TaskComment {
   id        String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
-  userId    String   @unique
-  name      String?
-  avatar    String?
+  taskId    String
+  userId    String
+  content   String
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model Subtask {
+  id        String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  taskId    String
+  content   String
+  completed Boolean  @default(false)
+  orderIndex Int     @default(0)
+  createdAt DateTime @default(now())
+
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+model Project {
+  id          String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  name        String
+  description String?
+  teamId      String?
+  ownerId     String
+  color       String   @default("#6366F1")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([ownerId])
+  @@index([teamId])
+}
+
+model TaskDependency {
+  id        String @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  blockerId String
+  blockedId String
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+  @@index([blockedId])
+}
+
+model TimeEntry {
+  id        String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  taskId    String
+  userId    String
+  minutes   Int
+  date      DateTime @default(now())
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([userId])
+}
+
+model Attachment {
+  id           String   @id @default(dbgenerated("(uuid_generate_v4())::text"))
+  taskId       String
+  task         Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  fileName     String
+  fileSize     Int
+  mimeType     String
+  storagePath  String
+  createdAt    DateTime @default(now())
+  uploadedById String
+
+  @@index([taskId])
 }

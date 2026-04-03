@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { isAdminUser } from '@/lib/adminAuth'
+import { adminCreateTaskSchema, adminUpdateTaskSchema } from '@/lib/validations'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,33 +14,9 @@ const supabaseAdmin = createClient(
   }
 )
 
-async function isUserAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: object) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: object) {
-          cookieStore.set({ name, value: '', ...options })
-        },
-      },
-    }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-  return user?.user_metadata?.isAdmin === true
-}
-
 export async function GET() {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
@@ -51,7 +27,8 @@ export async function GET() {
       .order('createdAt', { ascending: false })
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Error listing tasks:', error)
+      return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
     }
 
     return NextResponse.json({ tasks: data }, { status: 200 })
@@ -63,38 +40,33 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const { title, description, status, priority, dueDate, userId, teamId, assignedToId } = await request.json()
-
-    if (!title || !userId) {
-      return NextResponse.json(
-        { error: 'Title and user ID are required' },
-        { status: 400 }
-      )
-    }
-
+    const body = await request.json()
+    const parsed = adminCreateTaskSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
     const { data, error } = await supabaseAdmin
       .from('Task')
       .insert({
-        title,
-        description,
-        status: status || 'TODO',
-        priority: priority || 'MEDIUM',
-        dueDate,
-        userId,
-        teamId,
-        assignedToId,
-        createdById: userId
+        name: parsed.data.name,
+        description: parsed.data.description,
+        status: parsed.data.status ?? 'todo',
+        priority: parsed.data.priority ?? 'medium',
+        dueDate: parsed.data.dueDate,
+        userId: parsed.data.userId,
+        teamId: parsed.data.teamId,
+        assignedToId: parsed.data.assignedToId,
+        createdById: parsed.data.userId
       })
       .select()
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      console.error('Error creating task:', error)
+      return NextResponse.json({ error: 'Request failed' }, { status: 400 })
     }
 
     return NextResponse.json({ task: data }, { status: 201 })
@@ -106,7 +78,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
@@ -123,7 +95,8 @@ export async function DELETE(request: NextRequest) {
       .eq('id', taskId)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Error deleting task:', error)
+      return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
     }
 
     return NextResponse.json(
@@ -138,25 +111,24 @@ export async function DELETE(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const { taskId, title, description, status, priority, dueDate, assignedToId, completed } = await request.json()
-
-    if (!taskId) {
-      return NextResponse.json({ error: 'Task ID is required' }, { status: 400 })
-    }
+    const body = await request.json()
+    const parsed = adminUpdateTaskSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+    const { taskId, ...rest } = parsed.data
 
     const updates: Record<string, unknown> = {}
-    if (title) updates.title = title
-    if (description !== undefined) updates.description = description
-    if (status) updates.status = status
-    if (priority) updates.priority = priority
-    if (dueDate !== undefined) updates.dueDate = dueDate
-    if (assignedToId !== undefined) updates.assignedToId = assignedToId
-    if (completed !== undefined) updates.completed = completed
+    if (rest.name !== undefined) updates.name = rest.name
+    if (rest.description !== undefined) updates.description = rest.description
+    if (rest.status !== undefined) updates.status = rest.status
+    if (rest.priority !== undefined) updates.priority = rest.priority
+    if (rest.dueDate !== undefined) updates.dueDate = rest.dueDate
+    if (rest.assignedToId !== undefined) updates.assignedToId = rest.assignedToId
+    if (rest.completed !== undefined) updates.completed = rest.completed
 
     const { data, error } = await supabaseAdmin
       .from('Task')
@@ -166,7 +138,8 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      console.error('Error updating task:', error)
+      return NextResponse.json({ error: 'Request failed' }, { status: 400 })
     }
 
     return NextResponse.json({ task: data }, { status: 200 })

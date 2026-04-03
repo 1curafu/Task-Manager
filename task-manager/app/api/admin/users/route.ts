@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { isAdminUser } from '@/lib/adminAuth'
+import { adminCreateUserSchema, adminUpdateUserSchema } from '@/lib/validations'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,33 +14,9 @@ const supabaseAdmin = createClient(
   }
 )
 
-async function isUserAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: object) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: object) {
-          cookieStore.set({ name, value: '', ...options })
-        },
-      },
-    }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-  return user?.user_metadata?.isAdmin === true
-}
-
 export async function GET() {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
@@ -48,7 +24,8 @@ export async function GET() {
     const { data, error } = await supabaseAdmin.auth.admin.listUsers()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Error listing users:', error)
+      return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
     }
 
     return NextResponse.json({ users: data.users }, { status: 200 })
@@ -60,29 +37,25 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const { email, password, metadata } = await request.json()
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      )
-    }
+    const body = await request.json()
+    const parsed = adminCreateUserSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+    const { email, password } = parsed.data
 
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
-      user_metadata: metadata || {}
+      email_confirm: true
     })
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      console.error('Error creating user:', error)
+      return NextResponse.json({ error: 'Request failed' }, { status: 400 })
     }
 
     return NextResponse.json({ user: data.user }, { status: 201 })
@@ -94,7 +67,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
@@ -108,7 +81,8 @@ export async function DELETE(request: NextRequest) {
     const { error } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Error deleting user:', error)
+      return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
     }
 
     return NextResponse.json(
@@ -123,16 +97,15 @@ export async function DELETE(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const { userId, email, password, metadata, role } = await request.json()
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
-    }
+    const body = await request.json()
+    const parsed = adminUpdateUserSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+    const { userId, email, password, metadata } = parsed.data
 
     const updates: {
       email?: string
@@ -143,13 +116,6 @@ export async function PUT(request: NextRequest) {
     if (email) updates.email = email
     if (password) updates.password = password
     if (metadata) updates.user_metadata = metadata
-    
-    if (role !== undefined) {
-      updates.user_metadata = {
-        ...updates.user_metadata,
-        isAdmin: role === 'admin'
-      }
-    }
 
     const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
       userId,
@@ -157,7 +123,8 @@ export async function PUT(request: NextRequest) {
     )
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      console.error('Error updating user:', error)
+      return NextResponse.json({ error: 'Request failed' }, { status: 400 })
     }
 
     return NextResponse.json({ user: data.user }, { status: 200 })

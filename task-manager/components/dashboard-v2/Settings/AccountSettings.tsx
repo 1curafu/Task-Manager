@@ -3,8 +3,8 @@
 import React, { useState } from 'react'
 import { createClient } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import styles from '@/app/dashboard-new/dashboard.module.css'
-import { LockKey, Warning, Trash, SignOut } from '@phosphor-icons/react'
+import styles from '@/app/dashboard/dashboard.module.css'
+import { Lock, Warning as AlertTriangle, Trash as Trash2, SignOut as LogOut } from '@phosphor-icons/react'
 
 export function AccountSettings({ userEmail }: { userEmail: string, userId: string }) {
   const [newPassword, setNewPassword] = useState('')
@@ -120,14 +120,14 @@ export function AccountSettings({ userEmail }: { userEmail: string, userId: stri
                     className={styles.btnSecondary}
                     style={{ color: '#ef4444', borderColor: 'var(--color-red-100)' }}
                 >
-                    <SignOut size={18} /> Logout
+                    <LogOut size={18} /> Logout
                 </button>
             </div>
         </div>
 
         <div className={styles.card} style={{ maxWidth: '600px' }}>
         <div className={styles.cardHeader}>
-            <div className={styles.iconBox}><LockKey weight="fill" /></div>
+            <div className={styles.iconBox}><Lock /></div>
         </div>
         <h3 className={styles.cardTitle}>Security</h3>
         
@@ -175,7 +175,7 @@ export function AccountSettings({ userEmail }: { userEmail: string, userId: stri
 
         <div className={styles.card} style={{ maxWidth: '600px', borderColor: 'var(--color-red-100)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem', color: '#dc2626' }}>
-            <Warning size={24} weight="fill" />
+            <AlertTriangle size={24} />
             <h3 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Danger Zone</h3>
         </div>
         
@@ -188,7 +188,7 @@ export function AccountSettings({ userEmail }: { userEmail: string, userId: stri
                 onClick={() => setShowDeleteConfirm(true)}
                 className={styles.btnDanger}
             >
-                <Trash size={18} />
+                <Trash2 size={18} />
                 Delete Account
             </button>
         ) : (

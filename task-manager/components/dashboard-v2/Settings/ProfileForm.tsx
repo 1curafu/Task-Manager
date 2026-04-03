@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react'
 import { createClient } from '@/lib/supabaseClient'
-import styles from '@/app/dashboard-new/dashboard.module.css'
-import { User, FloppyDisk, Image as ImageIcon } from '@phosphor-icons/react'
+import styles from '@/app/dashboard/dashboard.module.css'
+import { User, FloppyDisk as Save, Image as ImageIcon } from '@phosphor-icons/react'
 import Image from 'next/image'
 
 interface Profile {
@@ -63,7 +63,7 @@ export function ProfileForm({ initialProfile, userId }: ProfileFormProps) {
   return (
     <div className={styles.card} style={{ maxWidth: '600px' }}>
       <div className={styles.cardHeader}>
-        <div className={styles.iconBox}><User weight="fill" /></div>
+        <div className={styles.iconBox}><User /></div>
       </div>
       <h3 className={styles.cardTitle}>Profile Settings</h3>
       
@@ -186,7 +186,7 @@ export function ProfileForm({ initialProfile, userId }: ProfileFormProps) {
             className={styles.btnPrimary}
             style={{ opacity: loading ? 0.7 : 1 }}
         >
-            <FloppyDisk size={20} />
+            <Save size={20} />
             {loading ? 'Saving...' : 'Save Changes'}
         </button>
 

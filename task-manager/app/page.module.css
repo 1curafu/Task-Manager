@@ -276,12 +276,9 @@
     display: none;
 }
 
-.mockupSidebarIcon {
-    height: 32px;
-    width: 32px;
-    background: var(--color-brand-blue);
-    border-radius: 6px;
+.mockupSidebarLogo {
     margin-bottom: 1.5rem;
+    flex-shrink: 0;
 }
 
 .mockupSidebarLine {

@@ -1,10 +1,9 @@
 'use client'
-'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabaseClient'
-import { MagnifyingGlass, CalendarBlank, Users, CheckCircle } from '@phosphor-icons/react/dist/ssr'
-import styles from '@/app/dashboard-new/dashboard.module.css'
+import { MagnifyingGlass as Search, Calendar, Users, CheckCircle } from '@phosphor-icons/react'
+import styles from '@/app/dashboard/dashboard.module.css'
 import { useRouter } from 'next/navigation'
 
 interface SearchResult {
@@ -16,16 +15,21 @@ interface SearchResult {
   teamId?: string | null
 }
 
-export function GlobalSearch({ userId }: { userId: string | null }) {
+interface GlobalSearchProps {
+  userId: string | null
+  focusRef?: { current: (() => void) | null }
+}
+
+export function GlobalSearch({ userId, focusRef }: GlobalSearchProps) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  
+
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const supabase = createClient()
   const router = useRouter()
-
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -37,6 +41,9 @@ export function GlobalSearch({ userId }: { userId: string | null }) {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
+  useEffect(() => {
+    if (focusRef) focusRef.current = () => inputRef.current?.focus()
+  }, [focusRef])
 
   useEffect(() => {
     if (!userId || query.trim().length < 2) {
@@ -51,6 +58,7 @@ export function GlobalSearch({ userId }: { userId: string | null }) {
         const { data } = await supabase
           .from('Task')
           .select('id, name, dueDate, completed, category, teamId')
+          .eq('isTemplate', false)
           .or(`userId.eq.${userId},assignedToId.eq.${userId}`)
           .ilike('name', `%${query}%`)
           .order('dueDate', { ascending: true })
@@ -68,8 +76,8 @@ export function GlobalSearch({ userId }: { userId: string | null }) {
     return () => clearTimeout(timer)
   }, [query, userId, supabase])
 
-  const handleResultClick = () => {
-    router.push('/dashboard-new/tasks')
+  const handleResultClick = (taskId: string) => {
+    router.push(`/dashboard/tasks?taskId=${taskId}`)
     setIsOpen(false)
     setQuery('')
   }
@@ -77,8 +85,9 @@ export function GlobalSearch({ userId }: { userId: string | null }) {
   return (
     <div ref={wrapperRef} className={styles.searchWrapper}>
       <div className={styles.searchBox}>
-        <MagnifyingGlass size={18} color="var(--color-slate-400)" />
-        <input 
+        <Search size={18} color="var(--color-slate-400)" />
+        <input
+          ref={inputRef}
           type="text"
           placeholder="Search tasks..."
           value={query}
@@ -102,12 +111,12 @@ export function GlobalSearch({ userId }: { userId: string | null }) {
               {results.map(task => (
                 <div 
                   key={task.id} 
-                  onClick={handleResultClick}
+                  onClick={() => handleResultClick(task.id)}
                   className={styles.searchResultItem}
                 >
                   <div className={styles.searchResultItemMain}>
                      {task.completed ? (
-                         <CheckCircle size={16} color="var(--color-slate-400)" weight="fill" />
+                         <CheckCircle size={16} color="var(--color-slate-400)" />
                      ) : (
                          <div className={styles.searchResultItemHollowCircle} />
                      )}
@@ -118,7 +127,7 @@ export function GlobalSearch({ userId }: { userId: string | null }) {
                   
                   <div className={styles.searchResultItemMeta}>
                     <span className={styles.searchResultItemMetaDate}>
-                        <CalendarBlank size={14} />
+                        <Calendar size={14} />
                         {new Date(task.dueDate).toLocaleDateString()}
                     </span>
                     {task.teamId && (
@@ -132,7 +141,7 @@ export function GlobalSearch({ userId }: { userId: string | null }) {
             </div>
           ) : (
             <div className={styles.searchNoResults}>
-              <MagnifyingGlass size={24} className={styles.searchNoResultsIcon} />
+              <Search size={24} className={styles.searchNoResultsIcon} />
               <div className={styles.searchNoResultsTitle}>No tasks found</div>
               <div className={styles.searchNoResultsSub}>Try a different search term</div>
             </div>

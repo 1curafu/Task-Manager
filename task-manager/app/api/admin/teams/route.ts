@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { isAdminUser } from '@/lib/adminAuth'
+import { adminCreateTeamSchema, adminUpdateTeamSchema } from '@/lib/validations'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,42 +14,12 @@ const supabaseAdmin = createClient(
   }
 )
 
-async function isUserAdmin(): Promise<boolean> {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value
-        },
-        set(name: string, value: string, options: object) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: object) {
-          cookieStore.set({ name, value: '', ...options })
-        },
-      },
-    }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-  return user?.user_metadata?.isAdmin === true
-}
-
 export async function GET() {
   try {
-
-    
-    const isAdmin = await isUserAdmin()
-
-    
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
-
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
-
 
     const { data: teams, error: teamsError } = await supabaseAdmin
       .from('Team')
@@ -58,7 +28,7 @@ export async function GET() {
 
     if (teamsError) {
       console.error('Database error:', teamsError)
-      return NextResponse.json({ error: teamsError.message }, { status: 500 })
+      return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
     }
 
     const teamsWithMembers = await Promise.all(
@@ -67,7 +37,7 @@ export async function GET() {
           .from('TeamMember')
           .select('*')
           .eq('teamId', team.id)
-        
+
         return {
           ...team,
           members: membersError ? [] : members
@@ -75,32 +45,24 @@ export async function GET() {
       })
     )
 
-
     return NextResponse.json({ teams: teamsWithMembers }, { status: 200 })
   } catch (error) {
     console.error('Caught exception in GET /api/admin/teams:', error)
-    return NextResponse.json({ 
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : String(error)
-    }, { status: 500 })
+    return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const { name, description, ownerId } = await request.json()
-
-    if (!name || !ownerId) {
-      return NextResponse.json(
-        { error: 'Team name and owner ID are required' },
-        { status: 400 }
-      )
-    }
+    const body = await request.json()
+    const parsed = adminCreateTeamSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+    const { name, description, ownerId } = parsed.data
 
     const { data, error } = await supabaseAdmin
       .from('Team')
@@ -113,7 +75,8 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      console.error('Error creating team:', error)
+      return NextResponse.json({ error: 'Request failed' }, { status: 400 })
     }
 
     return NextResponse.json({ team: data }, { status: 201 })
@@ -125,7 +88,7 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
@@ -142,7 +105,8 @@ export async function DELETE(request: NextRequest) {
       .eq('id', teamId)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('Error deleting team:', error)
+      return NextResponse.json({ error: 'Something went wrong' }, { status: 500 })
     }
 
     return NextResponse.json(
@@ -157,21 +121,20 @@ export async function DELETE(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const isAdmin = await isUserAdmin()
+    const isAdmin = await isAdminUser()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const { teamId, name, description, ownerId } = await request.json()
-
-    if (!teamId) {
-      return NextResponse.json({ error: 'Team ID is required' }, { status: 400 })
-    }
+    const body = await request.json()
+    const parsed = adminUpdateTeamSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+    const { teamId, ...rest } = parsed.data
 
     const updates: Record<string, string> = {}
-    if (name) updates.name = name
-    if (description !== undefined) updates.description = description
-    if (ownerId) updates.ownerId = ownerId
+    if (rest.name !== undefined) updates.name = rest.name
+    if (rest.description !== undefined) updates.description = rest.description
+    if (rest.ownerId !== undefined) updates.ownerId = rest.ownerId
 
     const { data, error } = await supabaseAdmin
       .from('Team')
@@ -181,7 +144,8 @@ export async function PUT(request: NextRequest) {
       .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      console.error('Error updating team:', error)
+      return NextResponse.json({ error: 'Request failed' }, { status: 400 })
     }
 
     return NextResponse.json({ team: data }, { status: 200 })
