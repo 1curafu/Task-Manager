@@ -1,3 +1,51 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme inline {
+  /* Colors — map project CSS variables to Tailwind utility names */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-card: var(--card-background);
+  --color-border: var(--border);
+  --color-primary: var(--primary-color);
+  --color-primary-hover: var(--primary-hover);
+  --color-danger: var(--danger-color);
+  --color-success: var(--success-color);
+  --color-warning: var(--warning-color);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+
+  /* Radius — tw- prefix avoids self-reference loop with same-named CSS variables */
+  --radius-tw-sm: var(--radius-sm);
+  --radius-tw-md: var(--radius-md);
+  --radius-tw-lg: var(--radius-lg);
+  --radius-tw-xl: var(--radius-xl);
+}
+
+/* ── shadcn internal variable bridge ───────────────────────────────────────
+   Maps shadcn component expectations to project design tokens.
+   Do not remove — shadcn components (Button, Card, Badge etc.) depend on these.
+   ────────────────────────────────────────────────────────────────────────── */
+:root {
+  --foreground: var(--text-primary);
+  --card: var(--card-background);
+  --muted: var(--surface);
+  --muted-foreground: var(--text-secondary);
+  --card-foreground: var(--text-primary);
+  --popover: var(--card-background);
+  --popover-foreground: var(--text-primary);
+  --primary-foreground: #ffffff;
+  --secondary: var(--surface);
+  --secondary-foreground: var(--text-primary);
+  --accent: var(--surface);
+  --accent-foreground: var(--text-primary);
+  --destructive: var(--danger-color);
+  --destructive-foreground: #ffffff;
+  --ring: var(--primary-color);
+  --input: var(--border);
+}
+
 :root {
   --primary-color: #0071e3;
   --primary-hover: #0077ed;
@@ -19,6 +67,7 @@
   --radius-md: 18px;
   --radius-lg: 24px;
   --radius-xl: 28px;
+  --status-in-review: #6e40c9;
 }
 
 :root[class~="dark"] {
@@ -40,6 +89,7 @@
   --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
   --glow-primary: 0 0 20px rgba(10, 132, 255, 0.4);
+  --status-in-review: #bf5af2;
 }
 
 .theme-toggle-button {
@@ -909,7 +959,7 @@ textarea.form-input {
   
   .form-input,
   .form-select {
-    font-size: 16px; /* Prevent zoom on iOS */
+    font-size: 16px;
   }
   
   .auth-title {
@@ -975,4 +1025,83 @@ textarea.form-input {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ─── Chalk Design System (dashboard-v3) ─── */
+:root {
+  /* shadcn-compatible channel format (R G B) */
+  --background: 250 248 245;
+  --foreground: 26 16 7;
+  --card: 255 255 255;
+  --card-foreground: 26 16 7;
+  --popover: 255 255 255;
+  --popover-foreground: 26 16 7;
+  --primary: 26 16 7;
+  --primary-foreground: 250 248 245;
+  --secondary: 242 239 233;
+  --secondary-foreground: 26 16 7;
+  --muted: 242 239 233;
+  --muted-foreground: 107 98 86;
+  --accent: 194 132 74;
+  --accent-foreground: 250 248 245;
+  --destructive: 192 57 43;
+  --destructive-foreground: 250 248 245;
+  --border: 228 221 212;
+  --input: 212 207 200;
+  --ring: 26 16 7;
+  --radius: 0.5rem;
+  --sidebar: 242 239 233;
+  --sidebar-foreground: 26 16 7;
+  --sidebar-border: 228 221 212;
+  /* Direct hex tokens for non-shadcn Tailwind usage */
+  --chalk-amber: #D97706;
+  --chalk-amber-bg: #FFF7ED;
+  --chalk-amber-border: #FED7AA;
+  --chalk-amber-dark: #92400E;
+  --chalk-sage: #5a7a50;
+  --chalk-sage-bg: #F0FDF4;
+  --chalk-vermillion: #DC2626;
+  --chalk-vermillion-bg: #FEF2F2;
+  --chalk-blue-bg: #EFF6FF;
+  --chalk-blue: #3B82F6;
+  --chalk-muted-text: #9A8F83;
+  --chalk-border: #E0D6CB;
+  --chalk-border-light: #EAE4DC;
+  --chalk-canvas: #F9F8F6;
+  --chalk-parchment: #F1EDE8;
+  --chalk-ink: #1A1007;
+  --chalk-ink-hover: #2D1F0E;
+  --chalk-surface: #FFFFFF;
+  /* Shadow scale */
+  --chalk-shadow-xs: 0 1px 2px rgba(0,0,0,0.06);
+  --chalk-shadow-sm: 0 1px 4px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --chalk-shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --chalk-shadow-lg: 0 8px 32px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.04);
+  /* Focus ring */
+  --chalk-focus-ring: 0 0 0 3px rgba(217,119,6,0.25);
+}
+
+.dark {
+  --background: 15 12 9;
+  --foreground: 250 248 245;
+  --card: 26 22 16;
+  --card-foreground: 250 248 245;
+  --popover: 26 22 16;
+  --popover-foreground: 250 248 245;
+  --primary: 250 248 245;
+  --primary-foreground: 26 16 7;
+  --secondary: 38 32 24;
+  --secondary-foreground: 250 248 245;
+  --muted: 38 32 24;
+  --muted-foreground: 184 175 158;
+  --accent: 194 132 74;
+  --accent-foreground: 250 248 245;
+  --destructive: 192 57 43;
+  --destructive-foreground: 250 248 245;
+  --border: 52 44 34;
+  --input: 52 44 34;
+  --ring: 250 248 245;
+  --sidebar: 22 18 12;
+  --sidebar-foreground: 250 248 245;
+  --sidebar-border: 52 44 34;
 }

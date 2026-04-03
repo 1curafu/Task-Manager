@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
+import { profileUpdateSchema } from '@/lib/validations'
+import { z } from 'zod'
 
 export async function PUT(request: NextRequest) {
   try {
@@ -32,7 +34,23 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const { email, password, metadata } = await request.json()
+    const payload = await request.json()
+    
+    // Server-side Input Validation
+    let validatedData;
+    try {
+      validatedData = await profileUpdateSchema.parseAsync(payload)
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation failed', details: validationError.issues },
+          { status: 400 }
+        )
+      }
+      return NextResponse.json({ error: 'Invalid input data' }, { status: 400 })
+    }
+
+    const { email, password, currentPassword, metadata } = validatedData;
 
     if (email && email !== user.email) {
       const { error: emailError } = await supabase.auth.updateUser({
@@ -48,15 +66,20 @@ export async function PUT(request: NextRequest) {
     }
 
     if (password) {
-      const { error: passwordError } = await supabase.auth.updateUser({
-        password: password
+      if (!currentPassword) {
+        return NextResponse.json({ error: 'Current password required' }, { status: 400 })
+      }
+      const { error: reAuthError } = await supabase.auth.signInWithPassword({
+        email: user.email!,
+        password: currentPassword,
       })
-
+      if (reAuthError) {
+        return NextResponse.json({ error: 'Current password is incorrect' }, { status: 403 })
+      }
+      const { error: passwordError } = await supabase.auth.updateUser({ password })
       if (passwordError) {
-        return NextResponse.json(
-          { error: 'Failed to update password: ' + passwordError.message },
-          { status: 400 }
-        )
+        console.error('[user/update password]', passwordError)
+        return NextResponse.json({ error: 'Failed to update password' }, { status: 400 })
       }
     }
 

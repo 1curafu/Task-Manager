@@ -4,9 +4,10 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabaseClient'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { X, Crown, Star, Trash, SignOut, PaperPlaneRight } from '@phosphor-icons/react'
+import { X, Crown, Star, Trash as Trash2, SignOut as LogOut, PaperPlaneRight as Send } from '@phosphor-icons/react'
 import { CustomDropdown } from '@/components/dashboard-v2/CustomDropdown'
 import { ConfirmDialog } from '@/components/dashboard-v2/ConfirmDialog'
+import styles from '@/app/dashboard/dashboard.module.css'
 
 interface Team {
   id: string
@@ -336,7 +337,7 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
                         gap: '0.5rem'
                     }}
                 >
-                    {isInviting ? 'Sending...' : <><PaperPlaneRight size={16} /> Send Invite</>}
+                    {isInviting ? 'Sending...' : <><Send size={16} /> Send Invite</>}
                 </button>
              </form>
              {notification && (
@@ -386,8 +387,8 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
                         </div>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        {member.role === 'owner' && <Crown size={16} weight="fill" color="#eab308" />}
-                        {member.role === 'admin' && <Star size={16} weight="fill" color="#64748b" />}
+                        {member.role === 'owner' && <Crown size={16} color="#eab308" />}
+                        {member.role === 'admin' && <Star size={16} color="#64748b" />}
                         <span style={{ 
                             fontSize: '0.75rem', 
                             padding: '0.125rem 0.375rem', 
@@ -403,7 +404,7 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
                                 title="Remove Member"
                                 style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444', padding: '0.25rem' }}
                             >
-                                <Trash size={16} />
+                                <Trash2 size={16} />
                             </button>
                         )}
                     </div>
@@ -416,16 +417,16 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
          {isOwner ? (
              <button 
                 onClick={handleDeleteTeam}
-                style={{ flex: 1, padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid #fee2e2', background: '#fef2f2', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}
+                className={styles.drawerDangerBtn}
              >
-                <Trash size={18} /> Delete Team
+                <Trash2 size={18} /> Delete Team
              </button>
          ) : (
              <button 
                 onClick={handleLeaveTeam}
-                style={{ flex: 1, padding: '0.75rem', borderRadius: '0.5rem', border: '1px solid var(--color-slate-200)', background: 'var(--color-white)', color: 'var(--color-slate-600)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}
+                className={styles.drawerSecondaryBtn}
              >
-                <SignOut size={18} /> Leave Team
+                <LogOut size={18} /> Leave Team
              </button>
          )}
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { CaretDown, Check } from '@phosphor-icons/react'
+import { CaretDown as ChevronDown, Check } from '@phosphor-icons/react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export interface DropdownOption {
@@ -75,7 +75,7 @@ export function CustomDropdown({
         }}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <CaretDown 
+        <ChevronDown 
             size={16} 
             color="var(--color-slate-400)" 
             style={{ 
@@ -142,7 +142,7 @@ export function CustomDropdown({
                   }}
                 >
                   <div style={{ width: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {isSelected && <Check size={14} weight="bold" color={isSelected ? 'white' : 'var(--color-brand-blue)'} />}
+                    {isSelected && <Check size={14} strokeWidth={3} color={isSelected ? 'white' : 'var(--color-brand-blue)'} />}
                   </div>
                   {option.icon && <span>{option.icon}</span>}
                   <span style={{ fontWeight: isSelected ? 500 : 400 }}>{option.label}</span>

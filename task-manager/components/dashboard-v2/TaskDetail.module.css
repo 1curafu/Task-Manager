@@ -1,0 +1,509 @@
+/* ── Page wrapper ────────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  background: transparent;
+}
+
+/* ── Top bar ─────────────────────────────────────────────────────── */
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-background);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  padding: 0;
+  transition: color 0.15s;
+}
+.backBtn:hover { color: var(--text-primary); }
+
+.breadcrumbSep { color: var(--text-tertiary); font-size: 0.875rem; }
+.breadcrumbCurrent { color: var(--text-primary); font-size: 0.875rem; font-weight: 500; }
+
+.topBarRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lastUpdated {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* ── Body content ────────────────────────────────────────────────── */
+.body {
+  max-width: 860px;
+  margin: 2rem auto;
+  padding: 3rem 4rem 4rem;
+  background: var(--card-background);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+/* ── Icon block ──────────────────────────────────────────────────── */
+.iconBlock {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  margin-bottom: 1.25rem;
+}
+
+/* ── Title row ───────────────────────────────────────────────────── */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.priorityBadge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ── Fields table ────────────────────────────────────────────────── */
+.fields {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.fieldRow {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  align-items: center;
+  min-height: 52px;
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.fieldRowTop {
+  align-items: flex-start;
+}
+
+.fieldLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  padding: 0.75rem 0;
+  flex-shrink: 0;
+}
+
+.fieldIcon {
+  font-size: 0.9rem;
+  opacity: 0.6;
+}
+
+.fieldValue {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  padding: 0.75rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px dashed currentColor;
+  flex-shrink: 0;
+}
+
+/* ── Assignee chip ───────────────────────────────────────────────── */
+.assigneeChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  background: rgba(52, 199, 89, 0.1);
+  color: #30d158;
+  border: 1px solid rgba(52, 199, 89, 0.2);
+}
+
+/* ── Tag chips ───────────────────────────────────────────────────── */
+.tagChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+
+/* ── Description box ─────────────────────────────────────────────── */
+.descriptionBox {
+  align-items: flex-start;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 0.875rem;
+  min-height: 60px;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  margin: 0.5rem 0;
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  display: block;
+}
+
+/* ── Attachment section ──────────────────────────────────────────── */
+.attachmentSection {
+  margin-bottom: 2rem;
+}
+
+.attachmentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.attachmentTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.downloadAll {
+  font-size: 0.8125rem;
+  color: var(--primary-color);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+.downloadAll:hover { opacity: 0.75; }
+
+/* ── Tabs ────────────────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.75rem 1.125rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 400;
+  transition: color 0.15s;
+  margin-bottom: -1px;
+}
+.tab:hover { color: var(--text-primary); }
+
+.tabActive {
+  color: var(--text-primary);
+  border-bottom-color: var(--text-primary);
+  font-weight: 500;
+}
+
+.tabBadge {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.05rem 0.45rem;
+  color: var(--text-secondary);
+}
+
+/* ── Tab content ─────────────────────────────────────────────────── */
+.tabContent { padding: 1.5rem 0; }
+
+/* ── Subtasks ────────────────────────────────────────────────────── */
+.subtaskHeader {
+  margin-bottom: 1.25rem;
+}
+
+.subtaskSectionName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 7px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--success-color, #30d158);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.progressLabel {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.subtaskList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 0.875rem;
+}
+
+.subtaskItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--card-background);
+  transition: background 0.15s;
+}
+.subtaskItem:hover { background: var(--surface); }
+.subtaskItem:last-child { border-bottom: none; }
+
+.subtaskDragHandle {
+  color: var(--text-tertiary);
+  cursor: grab;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.subtaskCheck {
+  margin-top: 2px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--success-color, #30d158);
+  width: 16px;
+  height: 16px;
+}
+
+.subtaskContent { flex: 1; }
+
+.subtaskText {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.subtaskTextDone {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+  font-weight: 400;
+}
+
+.subtaskNote {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+  line-height: 1.4;
+}
+
+.subtaskAdd {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.subtaskInput {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background: var(--surface);
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.subtaskInput::placeholder { color: var(--text-tertiary); }
+.subtaskInput:focus { border-color: var(--primary-color); }
+
+/* ── Comments ────────────────────────────────────────────────────── */
+.emptyState {
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.commentItem {
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.commentMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.375rem;
+}
+
+.commentAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.commentAuthor {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.commentTime {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+.commentBody {
+  margin: 0 0 0 2.25rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.commentInput {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background: var(--surface);
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  margin-top: 1.25rem;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+.commentInput::placeholder { color: var(--text-tertiary); }
+.commentInput:focus { border-color: var(--primary-color); }
+
+.postBtn, .addBtn {
+  margin-top: 0.625rem;
+  background: var(--text-primary);
+  color: var(--card-background);
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.postBtn:hover, .addBtn:hover { opacity: 0.82; }
+.addBtn {
+  margin-top: 0;
+}
+.addBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Activity ────────────────────────────────────────────────────── */
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.activityItem:last-child { border-bottom: none; }
+
+.activityDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.activityText {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}

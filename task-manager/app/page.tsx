@@ -5,18 +5,19 @@ import { createClient } from '@/lib/supabaseClient'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import styles from './page.module.css'
-import { 
-  CodeIcon, 
-  ArrowRightIcon, 
-  UsersThreeIcon, 
-  ShieldCheckIcon, 
-  CheckSquareIcon, 
-  BellIcon, 
-  CalendarIcon, 
-  GearIcon, 
-  LightningIcon, 
-  DatabaseIcon, 
-  LockKeyIcon, 
+import Image from 'next/image'
+import {
+  CodeIcon,
+  ArrowRightIcon,
+  UsersThreeIcon,
+  ShieldCheckIcon,
+  CheckSquareIcon,
+  BellIcon,
+  CalendarIcon,
+  GearIcon,
+  LightningIcon,
+  DatabaseIcon,
+  LockKeyIcon,
   DesktopIcon
 } from '@phosphor-icons/react'
 
@@ -84,7 +85,7 @@ export default function Landing() {
             <div className={styles.mockupBody}>
               <div className={styles.uiGrid}>
                 <div className={styles.uiSidebar}>
-                  <div className={styles.mockupSidebarIcon}></div>
+                  <Image src="/favicon.svg" alt="Vela Works" width={32} height={32} className={styles.mockupSidebarLogo} />
                   <div className={`${styles.mockupSidebarLine} ${styles.w70}`}></div>
                   <div className={`${styles.mockupSidebarLine} ${styles.w50}`}></div>
                 </div>

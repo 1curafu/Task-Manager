@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import { createClient } from '@/lib/supabaseClient'
 import { motion } from 'framer-motion'
-import styles from '@/app/dashboard-new/dashboard.module.css'
+import styles from '@/app/dashboard/dashboard.module.css'
 
 interface CreateTeamModalProps {
   userId: string

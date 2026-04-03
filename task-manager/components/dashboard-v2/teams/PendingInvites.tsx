@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabaseClient'
-import styles from '@/app/dashboard-new/dashboard.module.css'
-import { EnvelopeSimple, CheckCircle, XCircle } from '@phosphor-icons/react'
+import styles from '@/app/dashboard/dashboard.module.css'
+import { EnvelopeSimple as Mail, CheckCircle, XCircle } from '@phosphor-icons/react'
 
 interface PendingInvite {
   id: string
@@ -62,6 +62,9 @@ export function PendingInvites({ userEmail, userId, onAction }: { userEmail: str
 
   const handleAccept = async (inviteId: string) => {
     if (!userId) return
+    // Verify the invite belongs to the current user's email before accepting
+    const invite = invites.find(i => i.id === inviteId)
+    if (!invite || invite.userEmail !== userEmail) return
 
     try {
       setActionLoading(inviteId)
@@ -112,7 +115,7 @@ export function PendingInvites({ userEmail, userId, onAction }: { userEmail: str
   return (
     <div className={styles.invitesContainer}>
         <h3 className={styles.invitesHeader}>
-            <EnvelopeSimple size={20} weight="duotone" color="var(--color-brand-blue)" />
+            <Mail size={20} color="var(--color-brand-blue)" />
             Pending Invitations ({invites.length})
         </h3>
         
@@ -122,7 +125,7 @@ export function PendingInvites({ userEmail, userId, onAction }: { userEmail: str
                     
                     <div className={styles.inviteInfo}>
                         <div className={styles.inviteIcon}>
-                            <EnvelopeSimple size={20} weight="fill" />
+                            <Mail size={20} />
                         </div>
                         <div>
                             <div className={styles.inviteTeamName}>
@@ -148,7 +151,7 @@ export function PendingInvites({ userEmail, userId, onAction }: { userEmail: str
                             disabled={actionLoading === invite.id}
                             className={styles.inviteBtnAccept}
                         >
-                            <CheckCircle size={18} weight="bold" />
+                            <CheckCircle size={18} />
                             {actionLoading === invite.id ? 'Accepting...' : 'Accept'}
                         </button>
                     </div>

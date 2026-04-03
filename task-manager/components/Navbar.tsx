@@ -47,9 +47,7 @@ export function Navbar() {
             }
           }}
         >
-          <div className={styles.logoIcon}>
-            <Image src="/icon.svg" alt="Vela Works Logo" width={32} height={32} />
-          </div>
+          <Image src="/favicon.svg" alt="Vela Works Logo" width={32} height={32} />
           <Link href="/" className={styles.logoText}>Vela Works</Link>
         </div>
         <div className={styles.navLinks}>

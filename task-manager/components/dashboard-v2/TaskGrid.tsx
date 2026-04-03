@@ -1,8 +1,8 @@
 'use client'
 
 import React from 'react'
-import styles from '@/app/dashboard-new/dashboard.module.css'
-import { Calendar, WarningCircle, Clock, CheckCircle } from '@phosphor-icons/react'
+import styles from '@/app/dashboard/dashboard.module.css'
+import { Circle } from '@phosphor-icons/react'
 import { isToday, isPast, isFuture, parseISO } from 'date-fns'
 import { motion } from 'framer-motion'
 
@@ -46,36 +46,40 @@ export function TaskGrid({ tasks, onTaskClick }: TaskGridProps) {
 
   const cards = [
     { 
-      title: 'My Focus', 
-      subtitle: 'Due Today',
+      title: 'Due Today', 
+      subtitle: 'MY FOCUS',
       tasks: dueToday, 
-      icon: <Calendar weight="fill" />, 
-      style: styles.cardBlue,
-      emptyMsg: 'No tasks due today'
+      icon: <Circle size={20} color="#a855f7" strokeWidth={2.5} />, 
+      style: styles.cardBorderPurple,
+      emptyMsg: 'No tasks due today',
+      countColor: '#a855f7'
     },
     { 
       title: 'High Priority', 
-      subtitle: 'Needs Attention',
+      subtitle: 'NEEDS ATTENTION',
       tasks: highPriority, 
-      icon: <WarningCircle weight="fill" />, 
-      style: styles.cardOrange,
-      emptyMsg: 'No high priority tasks'
+      icon: <Circle size={20} color="#ef4444" strokeWidth={2.5} />, 
+      style: styles.cardBorderRed,
+      emptyMsg: 'No high priority tasks',
+      countColor: '#ef4444'
     },
     { 
       title: 'Overdue', 
-      subtitle: 'Missed Deadlines',
+      subtitle: 'MISSED DEADLINES',
       tasks: overdue, 
-      icon: <Clock weight="fill" />, 
-      style: styles.cardPurple,
-      emptyMsg: 'All caught up!'
+      icon: <Circle size={20} color="#f59e0b" strokeWidth={2.5} />, 
+      style: styles.cardBorderOrange,
+      emptyMsg: 'All caught up!',
+      countColor: '#f59e0b'
     },
      { 
       title: 'Upcoming', 
-      subtitle: 'Future',
+      subtitle: 'SCHEDULED',
       tasks: upcoming, 
-      icon: <CheckCircle weight="fill" />,
-      style: styles.cardGreen,
-      emptyMsg: 'Nothing scheduled soon'
+      icon: <Circle size={20} color="#06b6d4" strokeWidth={2.5} />,
+      style: styles.cardBorderTeal,
+      emptyMsg: 'Nothing scheduled soon',
+      countColor: '#06b6d4'
     }
   ]
 
@@ -109,8 +113,11 @@ export function TaskGrid({ tasks, onTaskClick }: TaskGridProps) {
         >
           <div className={styles.cardHeader}>
              <div className={styles.iconBox}>{card.icon}</div>
+             <div className={styles.cardHeaderCount} style={{ color: card.countColor }}>
+               {String(card.tasks.length).padStart(2, '0')}
+             </div>
           </div>
-          <div>
+          <div className={styles.cardTitleBlock}>
             <h3 className={styles.cardTitle}>{card.title}</h3>
             <p className={styles.cardSubtitle}>{card.subtitle}</p>
           </div>
