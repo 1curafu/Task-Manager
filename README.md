@@ -1,518 +1,262 @@
-# Task Manager
+# Vela Works
 
-> A modern, collaborative task management application built with Next.js 16, Supabase, and Prisma.
+> A full-stack team collaboration and task management application — [vela.works](https://vela.works)
 
-![Next.js](https://img.shields.io/badge/Next.js-16.0.1-black?style=flat&logo=next.js)
-![React](https://img.shields.io/badge/React-19.2.0-blue?style=flat&logo=react)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat&logo=next.js)
+![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20Storage-green?style=flat&logo=supabase)
-![Prisma](https://img.shields.io/badge/Prisma-6.19.0-2D3748?style=flat&logo=prisma)
+![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat&logo=prisma)
 
 ## Features
 
-### Authentication & User Management
-
-- **Secure Authentication** with Supabase Auth
-- **User Profiles** with customizable avatars
-- **Password Management** with strength validation
-- **Account Deletion** with team ownership transfer
-- **Admin Panel** for user and team management
-
 ### Task Management
-
-- **Personal Tasks** with due dates and categories
-- **Team Task Assignment** for collaborative work
-- **Task Completion Tracking** with status updates
-- **Notes & Links** attached to tasks
+- **Personal & Team Tasks** with due dates, priorities, status tracking, and categories
+- **Kanban Board** with drag-and-drop reordering via `@dnd-kit`
 - **Calendar View** for visualizing deadlines
-- **Inbox Panel** for quick task overview
+- **Analytics Dashboard** with charts (Recharts)
+- **Subtasks & Comments** on individual tasks
+- **File Attachments** via Supabase Storage
+- **Markdown Notes** with live preview
+- **Labels** for task categorization
 
 ### Team Collaboration
+- **Create & Manage Teams** with role-based access (Owner, Admin, Member)
+- **Team Invitations** via email with accept/decline flow
+- **Team Task Assignment** and delegation
+- **Real-time Updates** via Supabase Realtime subscriptions
+- **Inbox** with live notification panel
 
-- **Create & Manage Teams** with role-based access
-- **Team Invitations** via email
-- **Role Management** (Owner, Admin, Member)
-- **Team Task Delegation** by owners/admins
-- **Real-time Notifications** for team activities
+### Authentication & User Management
+- **Supabase Auth** — email/password + OAuth
+- **User Profiles** with avatar upload to Supabase Storage
+- **Password Management** with reset via email
+- **Account Deletion** with team ownership transfer
+- **Admin Panel** for managing all users, teams, and tasks
 
-### Additional Features
-
-- **Notes System** for personal note-taking
-- **Notifications** with real-time updates
-- **Avatar Upload** to Supabase Storage
-- **Responsive Design** with modern white theme
-- **Row-Level Security (RLS)** for data protection
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Client (Next.js)                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐ │
-│  │Dashboard │  │  Teams   │  │  Admin   │  │  Auth   │ │
-│  └──────────┘  └──────────┘  └──────────┘  └─────────┘ │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│                    API Routes (Next.js)                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐ │
-│  │ User Routes │  │ Task Routes │  │  Admin Routes   │ │
-│  └─────────────┘  └─────────────┘  └─────────────────┘ │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│                  Supabase Backend                        │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  │
-│  │   Auth       │  │  PostgreSQL   │  │   Storage    │  │
-│  │  (Users)     │  │  (Database)   │  │  (Avatars)   │  │
-│  └──────────────┘  └──────────────┘  └──────────────┘  │
-└─────────────────────────────────────────────────────────┘
-```
+### Security
+- **Row-Level Security (RLS)** on all tables
+- **Edge auth proxy** (`proxy.ts`) guarding `/dashboard/*` and `/admin/*`
+- **Content Security Policy** headers via `next.config.ts`
+- **Zod validation** on all API inputs
+- **Prisma singleton** pattern to prevent connection pool exhaustion
 
 ## Tech Stack
 
-| Category             | Technology                  |
-| -------------------- | --------------------------- |
-| **Framework**  | Next.js 16.0.7 (App Router) |
-| **Language**   | TypeScript 5                |
-| **UI Library** | React 19.2.0                |
-| **Styling**    | CSS                         |
-| **Database**   | PostgreSQL (via Supabase)   |
-| **ORM**        | Prisma 6.19.0               |
-| **Auth**       | Supabase Auth               |
-| **Storage**    | Supabase Storage            |
-| **Validation** | Zod 4.1.12                  |
-| **Date Utils** | date-fns 4.1.0              |
-| **Deployment** | Vercel                      |
+| Category | Technology |
+|---|---|
+| **Framework** | Next.js 16 (App Router, Turbopack) |
+| **Language** | TypeScript 5 |
+| **UI Library** | React 19 |
+| **Styling** | CSS Modules + global CSS variables (no Tailwind in dashboard) |
+| **Animations** | Framer Motion |
+| **Drag & Drop** | @dnd-kit |
+| **Icons** | Phosphor Icons |
+| **Charts** | Recharts |
+| **Database** | PostgreSQL via Supabase |
+| **ORM** | Prisma 6 |
+| **Auth** | Supabase Auth |
+| **Storage** | Supabase Storage |
+| **Validation** | Zod |
+| **Date Utils** | date-fns |
+| **Deployment** | Vercel |
 
 ## Project Structure
 
 ```
 task-manager/
 ├── app/
-│   ├── api/                      # API Routes
-│   │   ├── admin/               # Admin endpoints
-│   │   ├── tasks/               # Task CRUD
-│   │   └── user/                # User management
-│   ├── auth/                     # Authentication pages
+│   ├── api/                          # API Route handlers
+│   │   ├── admin/                   # Admin-only endpoints
+│   │   ├── attachments/             # File attachment CRUD
+│   │   ├── teams/                   # Team management
+│   │   ├── upload/                  # File upload
+│   │   └── user/                    # User management
+│   ├── auth/                         # Auth pages
 │   │   ├── login/
 │   │   ├── register/
 │   │   ├── forgot-password/
-│   │   └── reset-password/
-│   ├── admin/                    # Admin dashboard
-│   ├── dashboard/                # Main dashboard
-│   ├── layout.tsx                # Root layout
-│   └── page.tsx                  # Landing page
-├── components/                   # React components
-│   ├── CalendarView.tsx
-│   ├── InboxPanel.tsx
-│   ├── TeamsPanel.tsx
-│   ├── ProfileModal.tsx
-│   └── ...
-├── lib/                          # Utilities
-│   ├── supabaseClient.ts        # Browser client
-│   ├── supabaseServer.ts        # Server client
-│   ├── prisma.ts                # Prisma client
-│   └── validations.ts           # Zod schemas
+│   │   ├── reset-password/
+│   │   └── callback/
+│   ├── admin/                        # Admin dashboard
+│   ├── dashboard/                    # Main dashboard (all pages)
+│   │   ├── analytics/
+│   │   ├── calendar/
+│   │   ├── kanban/
+│   │   ├── notes/
+│   │   ├── settings/
+│   │   ├── tasks/
+│   │   │   └── [taskId]/
+│   │   ├── teams/
+│   │   ├── layout.tsx               # Session guard + sidebar + header
+│   │   └── dashboard.module.css     # All dashboard styles
+│   ├── layout.tsx                    # Root layout (ThemeProvider)
+│   └── page.tsx                      # Landing page
+├── components/
+│   ├── dashboard-v2/                 # Active dashboard component library
+│   │   ├── Settings/
+│   │   ├── teams/
+│   │   ├── Header.tsx
+│   │   ├── Sidebar.tsx
+│   │   ├── TaskActionModal.tsx
+│   │   ├── TaskDetail.tsx
+│   │   ├── KanbanBoard.tsx
+│   │   ├── Calendar.tsx
+│   │   ├── InboxPanel.tsx
+│   │   └── ...
+│   ├── ui/                           # shadcn/ui shared components
+│   ├── Navbar.tsx                    # Landing page navbar
+│   ├── Footer.tsx                    # Landing page footer
+│   └── ThemeProvider.tsx
+├── hooks/                            # Custom React hooks
+│   ├── useRealtimeTasks.ts
+│   ├── useRealtimeInvites.ts
+│   ├── useDueReminders.ts
+│   └── useKeyboardShortcuts.ts
+├── lib/
+│   ├── supabaseClient.ts            # Browser Supabase client
+│   ├── supabaseServer.ts            # Server Supabase client
+│   ├── prisma.ts                    # Prisma singleton
+│   ├── adminAuth.ts                 # Admin auth helper
+│   ├── validations.ts               # Zod schemas
+│   ├── queries/                     # Data-fetching helpers
+│   └── mutations/                   # Data-mutation helpers
+├── types/
+│   └── task.ts                      # Shared TypeScript types
 ├── prisma/
-│   ├── schema.prisma            # Database schema
-│   ├── sql/                     # SQL migrations
-│   └── COMPLETE_SETUP.sql       # Full setup script
-├── public/                       # Static assets
-├── .env.example                  # Environment template
-├── next.config.ts               # Next.js config
-├── tsconfig.json                # TypeScript config
-└── package.json                 # Dependencies
+│   └── schema.prisma                # Database schema
+├── proxy.ts                          # Edge auth middleware
+└── next.config.ts                    # Security headers + config
 ```
 
 ## Getting Started
 
 ### Prerequisites
 
-- **Node.js** 20.x or higher
-- **npm** or **yarn**
-- **Supabase Account** ([sign up here](https://supabase.com))
-- **Git** for version control
+- Node.js 20+
+- A [Supabase](https://supabase.com) project
 
-### 1. Clone the Repository
+### 1. Clone & install
 
 ```bash
 git clone https://github.com/1curafu/Task-Manager.git
-cd task-manager
-```
-
-### 2. Install Dependencies
-
-```bash
+cd Task-Manager/task-manager
 npm install
 ```
 
-### 3. Environment Configuration
+### 2. Environment variables
 
-Create a `.env` file in the root directory:
-
-```bash
-cp .env.example .env
-```
-
-Update the `.env` file with your credentials:
+Create a `.env` file inside `task-manager/`:
 
 ```env
-# Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-# Database Configuration (from Supabase)
-DATABASE_URL="postgresql://postgres.xxx:password@aws-x-region.pooler.supabase.com:6543/postgres?pgbouncer=true"
-DIRECT_URL="postgresql://postgres.xxx:password@aws-x-region.pooler.supabase.com:5432/postgres"
+# Pooled connection (runtime)
+DATABASE_URL="postgresql://postgres.xxx:password@pooler.supabase.com:6543/postgres?pgbouncer=true"
+# Direct connection (migrations)
+DIRECT_URL="postgresql://postgres.xxx:password@pooler.supabase.com:5432/postgres"
 
-# Admin Configuration
-SUPABASE_SERVICE_ROLE_KEY="your_supabase_service_role_key"
-ADMIN_EMAILS="admin1@example.com,admin2@example.com"
+# Comma-separated list of admin emails
+ADMIN_EMAILS="admin@example.com"
 ```
 
-**Where to find these values:**
+Find these values in your Supabase dashboard under **Project Settings → API** and **Project Settings → Database**.
 
-- Go to your [Supabase Dashboard](https://app.supabase.com)
-- **Project Settings** → **API** for URLs and keys
-- **Project Settings** → **Database** for connection strings
-
-### 4. Database Setup
-
-Run the complete database setup script (see [`DATABASE.md`](./DATABASE.md) for details):
+### 3. Database setup
 
 ```bash
-# 1. Set up Prisma
 npx prisma generate
 npx prisma db push
-
-# 2. Run database setup in Supabase SQL Editor
-# Copy and execute the contents of prisma/COMPLETE_SETUP.sql
 ```
 
-### 5. Run Development Server
+Then run the RLS and SQL setup scripts from `prisma/` in the Supabase SQL Editor.
+
+### 4. Run
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Setup Instructions
-
-### 1. Clone the repository
+## Commands
 
 ```bash
-git clone <your-repo-url>
-cd task-manager
+npm run dev       # Development server (localhost:3000)
+npm run build     # Production build
+npm run lint      # ESLint
+
+npx prisma studio          # Visual DB browser
+npx prisma db push         # Push schema changes (dev)
+npx prisma migrate deploy  # Apply migrations (prod)
+npx prisma generate        # Regenerate Prisma client
 ```
 
-### 2. Install dependencies
+## API Routes
 
-```bash
-npm install
+### User
+```
+POST   /api/user/update              # Update profile / avatar / password
+DELETE /api/user/delete              # Delete account
+POST   /api/user/update-onboarding   # Mark onboarding complete
 ```
 
-### 3. Set up environment variables
-
-Create `.env` and `.env.local` files in the root directory:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-
-DATABASE_URL="postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
-
-DIRECT_URL="postgresql://postgres.[PROJECT-REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
+### Teams
+```
+POST   /api/teams/invite/accept      # Accept team invitation
+POST   /api/teams/invite/decline     # Decline team invitation
+POST   /api/teams/leave              # Leave a team
+DELETE /api/teams/delete             # Delete a team (owner only)
 ```
 
-### 4. Set up Supabase
-
-1. Create a project at [supabase.com](https://supabase.com)
-2. Go to **Project Settings** → **Database** → **Connection string**
-3. Copy your connection strings and update `.env` files
-
-### 5. Set up the database
-
-⚠️ **Important:** Follow the complete database setup guide:
-
-```bash
-# See DATABASE_SETUP.md for detailed instructions
+### Attachments
+```
+GET    /api/attachments              # List task attachments
+POST   /api/attachments/upload       # Upload file
+GET    /api/attachments/[id]/url     # Get signed download URL
+DELETE /api/attachments/[id]         # Delete attachment
 ```
 
-Quick steps:
-
-1. Run Prisma migrations: `npx prisma migrate deploy`
-2. Run `prisma/fix-uuid-defaults.sql` in Supabase SQL Editor
-3. Run `prisma/enable-rls.sql` in Supabase SQL Editor
-
-** [Full Database Setup Guide](./DATABASE_SETUP.md)**
-
-### 6. Generate Prisma Client
-
-```bash
-npx prisma generate
+### Admin (admin-only)
+```
+GET    /api/admin/users              # List all users
+PUT    /api/admin/users              # Toggle admin role
+DELETE /api/admin/users              # Delete user
+GET    /api/admin/teams              # List all teams
+DELETE /api/admin/teams              # Delete team
+GET    /api/admin/tasks              # List all tasks
+DELETE /api/admin/tasks              # Delete task
 ```
 
 ## Database Schema
 
-### Core Tables
+Core models: `Task`, `Subtask`, `TaskComment`, `TaskLabel`, `Label`, `Note`, `Notification`, `Team`, `TeamMember`, `Profile`, `Attachment`.
 
-#### **Task**
+All tables use UUID primary keys and RLS enforced in Supabase.
 
-```typescript
-{
-  id: string (UUID)
-  name: string
-  dueDate: DateTime
-  responsible: string?
-  category: string?
-  notes: string?
-  links: string?
-  userId: string          // Task owner
-  teamId: string?         // Optional team assignment
-  assignedToId: string?   // Assigned user
-  createdById: string?    // Task creator
-  completed: boolean
-  createdAt: DateTime
-  lastUpdated: DateTime
-}
-```
+## Security
 
-#### **Team**
-
-```typescript
-{
-  id: string (UUID)
-  name: string
-  description: string?
-  ownerId: string
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-```
-
-#### **TeamMember**
-
-```typescript
-{
-  id: string (UUID)
-  teamId: string
-  userId: string?
-  userEmail: string
-  role: 'owner' | 'admin' | 'member'
-  status: 'pending' | 'accepted' | 'declined'
-  invitedBy: string
-  invitedAt: DateTime
-  respondedAt: DateTime?
-}
-```
-
-#### **Profile**
-
-```typescript
-{
-  id: string (UUID)
-  userId: string (unique)
-  name: string?
-  avatar: string?         // Supabase Storage URL
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-```
-
-#### **Note**
-
-```typescript
-{
-  id: string (UUID)
-  content: string
-  userId: string
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-```
-
-#### **Notification**
-
-```typescript
-{
-  id: string (UUID)
-  userId: string
-  type: string
-  title: string
-  message: string
-  isRead: boolean
-  link: string?
-  createdAt: DateTime
-}
-```
-
-See [`DATABASE.md`](./DATABASE.md) for complete RLS policies and setup instructions.
-
-## Security Features
-
-### Row-Level Security (RLS)
-
-All tables use Supabase RLS policies:
-
-- **Tasks**: Users see only their own tasks and team tasks they have access to
-- **Teams**: Members can view team info, owners/admins can manage
-- **Profiles**: Public read, users update own profile, admins have full access
-- **Notifications**: Users see only their own notifications
-- **Notes**: Users manage only their own notes
-
-### Authentication
-
-- **Secure password hashing** via Supabase Auth
-- **Email verification** for new accounts
-- **Password reset** with email tokens
-- **Session management** with HTTP-only cookies
-
-### Admin System
-
-- **Role-based access control** via `is_admin()` function
-- **Admin panel** restricted to authorized users
-- **Audit trails** for admin actions
-
-## UI/UX
-
-### Design System
-
-- **White Theme** - Clean, modern interface
-- **Responsive Layout** - Works on mobile, tablet, desktop
-- **Smooth Animations** - CSS transitions and keyframes
-- **Accessibility** - WCAG compliant color contrasts
-
-### Components
-
-- **Modals** - Profile settings, team invites, confirmations
-- **Panels** - Inbox, Teams, Notes with collapsible sections
-- **Calendar** - Visual task timeline
-- **Forms** - Validated inputs with real-time feedback
-
-## API Routes
-
-### User Management
-
-```
-POST   /api/user/update       # Update profile, avatar, password
-DELETE /api/user/delete       # Delete account with team transfer
-```
-
-### Admin
-
-```
-GET    /api/admin/users       # List all users (admin only)
-GET    /api/admin/teams       # List all teams (admin only)
-GET    /api/admin/tasks       # List all tasks (admin only)
-```
-
-### Tasks
-
-```
-GET    /api/tasks             # Fetch user's tasks
-POST   /api/tasks             # Create new task
-PUT    /api/tasks/:id         # Update task
-DELETE /api/tasks/:id         # Delete task
-```
+- **Edge proxy** (`proxy.ts`) — unauthenticated requests to `/dashboard/*` and `/admin/*` are redirected to `/auth/login` before any page code runs
+- **RLS** — every table has row-level security policies; users can only access their own data and team data they're a member of
+- **CSP** — `Content-Security-Policy`, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` headers on all responses
+- **Service role key** — used only in API route handlers, never in client components
+- **Zod** — all API inputs are validated before hitting the database
 
 ## Deployment
 
-### Deploy to Vercel
+The app deploys to [Vercel](https://vercel.com). Add all environment variables from step 2 in **Vercel → Settings → Environment Variables**, then add your Vercel domain to Supabase's allowed redirect URLs:
 
-[![Deploy](https://img.shields.io/badge/▲_Deploy-black?style=for-the-badge)](https://www.vela.works/)
-
-#### Manual Deployment
-
-1. **Push to GitHub**
-
-   ```bash
-   git push origin main
-   ```
-2. **Import to Vercel**
-
-   - Go to [vercel.com](https://vercel.com)
-   - Import your GitHub repository
-   - Add environment variables (same as `.env`)
-3. **Configure Supabase**
-
-   - Add Vercel domain to Supabase redirect URLs:
-
-   ```
-   https://your-app.vercel.app/auth/login
-   https://your-app.vercel.app/auth/callback
-   https://your-app.vercel.app/dashboard
-   ```
-4. **Deploy**
-
-   - Click "Deploy"
-   - Wait for build to complete
-
-### Environment Variables in Vercel
-
-Add these in **Settings → Environment Variables**:
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `DATABASE_URL`
-- `DIRECT_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `ADMIN_EMAILS`
-
-## Testing
-
-```bash
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run production build
-npm start
-
-# Lint code
-npm run lint
 ```
-
-## Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+https://your-app.vercel.app/auth/callback
+https://your-app.vercel.app/auth/login
+```
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 (GPL-3.0).
-
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-
-See [LICENSE](LICENSE) file for details.
+GNU General Public License v3.0 — see [LICENSE](LICENSE) for details.
 
 ## Author
 
-**Mykhailo Khimich**
-
-- GitHub: [@1curafu](https://github.com/1curafu)
-- Repository: [Task-Manager](https://github.com/1curafu/Task-Manager)
-
-## Acknowledgments
-
-- [Next.js](https://nextjs.org/) for the amazing framework
-- [Supabase](https://supabase.com/) for backend infrastructure
-- [Prisma](https://www.prisma.io/) for database tooling
-- [Vercel](https://vercel.com/) for deployment platform
-
-## Support
-
-For questions or issues:
-
-- Open an [Issue](https://github.com/1curafu/Task-Manager/issues)
-- Check existing [Discussions](https://github.com/1curafu/Task-Manager/discussions)
+**Mykhailo Khimich** · [@1curafu](https://github.com/1curafu)
