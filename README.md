@@ -2,8 +2,8 @@
 
 > A full-stack team collaboration and task management application — [vela.works](https://vela.works)
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat&logo=next.js)
-![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react)
+![Next.js](https://img.shields.io/badge/Next.js-16.0.7-black?style=flat&logo=next.js)
+![React](https://img.shields.io/badge/React-19.2.0-blue?style=flat&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript)
 ![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20Storage-green?style=flat&logo=supabase)
 ![Prisma](https://img.shields.io/badge/Prisma-6-2D3748?style=flat&logo=prisma)
