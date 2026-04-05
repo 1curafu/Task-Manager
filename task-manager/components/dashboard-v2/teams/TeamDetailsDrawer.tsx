@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { X, Crown, Star, Trash as Trash2, SignOut as LogOut, PaperPlaneRight as Send } from '@phosphor-icons/react'
 import { CustomDropdown } from '@/components/dashboard-v2/CustomDropdown'
-import { ConfirmDialog } from '@/components/dashboard-v2/ConfirmDialog'
+import ConfirmModal, { ConfirmModalVariant } from '@/components/dashboard-v2/ConfirmModal'
 import styles from '@/app/dashboard/dashboard.module.css'
 
 interface Team {
@@ -46,14 +46,14 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
     isOpen: boolean
     title: string
     message: string
-    isDestructive: boolean
+    variant: ConfirmModalVariant
     confirmLabel: string
     onConfirm: () => Promise<void>
   }>({
     isOpen: false,
     title: '',
     message: '',
-    isDestructive: false,
+    variant: 'danger',
     confirmLabel: 'Confirm',
     onConfirm: async () => {}
   })
@@ -156,7 +156,7 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
           isOpen: true,
           title: 'Remove Member',
           message: 'Are you sure you want to remove this member from the team?',
-          isDestructive: true,
+          variant: 'danger',
           confirmLabel: 'Remove',
           onConfirm: async () => {
               setActionLoading(true)
@@ -185,7 +185,7 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
           isOpen: true,
           title: 'Leave Team',
           message: 'Are you sure you want to leave this team?',
-          isDestructive: true,
+          variant: 'warning',
           confirmLabel: 'Leave',
           onConfirm: async () => {
               setActionLoading(true)
@@ -212,7 +212,7 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
           isOpen: true,
           title: 'Delete Team',
           message: 'Are you sure you want to DELETE this team? This action cannot be undone.',
-          isDestructive: true,
+          variant: 'danger',
           confirmLabel: 'Delete Team',
           onConfirm: async () => {
               setActionLoading(true)
@@ -432,12 +432,12 @@ export function TeamDetailsDrawer({ teamId, userId, onClose, onUpdate }: TeamDet
         </div>
       </motion.div>
       
-      <ConfirmDialog 
+      <ConfirmModal
           isOpen={confirmConfig.isOpen}
           title={confirmConfig.title}
           message={confirmConfig.message}
-          isDestructive={confirmConfig.isDestructive}
-          confirmLabel={confirmConfig.confirmLabel}
+          variant={confirmConfig.variant}
+          confirmText={confirmConfig.confirmLabel}
           onConfirm={confirmConfig.onConfirm}
           onCancel={closeConfirm}
           loading={actionLoading}

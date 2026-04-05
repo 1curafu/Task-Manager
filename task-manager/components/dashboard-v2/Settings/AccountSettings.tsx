@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import styles from '@/app/dashboard/dashboard.module.css'
 import { Lock, Warning as AlertTriangle, Trash as Trash2, SignOut as LogOut } from '@phosphor-icons/react'
+import ConfirmModal from '@/components/dashboard-v2/ConfirmModal'
 
 export function AccountSettings({ userEmail }: { userEmail: string, userId: string }) {
   const [newPassword, setNewPassword] = useState('')
@@ -14,7 +15,6 @@ export function AccountSettings({ userEmail }: { userEmail: string, userId: stri
   
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
-  const [deleteAcknowledged, setDeleteAcknowledged] = useState(false)
   
   const supabase = createClient()
   const router = useRouter()
@@ -74,8 +74,6 @@ export function AccountSettings({ userEmail }: { userEmail: string, userId: stri
   }
 
   const handleDeleteAccount = async () => {
-    if (!deleteAcknowledged) return
-
     try {
       setDeleting(true)
       
@@ -183,54 +181,30 @@ export function AccountSettings({ userEmail }: { userEmail: string, userId: stri
             Deleting your account is permanent and cannot be undone. All your tasks, notes, and data will be removed immediately.
         </p>
 
-        {!showDeleteConfirm ? (
-            <button 
-                onClick={() => setShowDeleteConfirm(true)}
-                className={styles.btnDanger}
-            >
-                <Trash2 size={18} />
-                Delete Account
-            </button>
-        ) : (
-            <div style={{ padding: '1.5rem', background: 'var(--color-red-50)', borderRadius: '0.75rem', border: '1px solid var(--color-red-100)' }}>
-                <p style={{ fontWeight: 600, color: '#dc2626', marginBottom: '1rem' }}>Are you absolutely sure?</p>
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '1.5rem', cursor: 'pointer' }}>
-                    <input 
-                        type="checkbox" 
-                        checked={deleteAcknowledged}
-                        onChange={(e) => setDeleteAcknowledged(e.target.checked)}
-                        style={{ marginTop: '0.25rem' }}
-                    />
-                    <span style={{ fontSize: '0.9rem', color: 'var(--color-slate-600)', lineHeight: 1.4 }}>
-                        I understand that this action is permanent and my data cannot be recovered. ({userEmail})
-                    </span>
-                </label>
-                
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button 
-                        onClick={() => {
-                            setShowDeleteConfirm(false)
-                            setDeleteAcknowledged(false)
-                        }}
-                        className={styles.btnSecondary}
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        onClick={handleDeleteAccount}
-                        disabled={!deleteAcknowledged || deleting}
-                        className={styles.btnPrimary}
-                        style={{ 
-                            background: '#dc2626',
-                            opacity: (!deleteAcknowledged || deleting) ? 0.5 : 1,
-                            cursor: (!deleteAcknowledged || deleting) ? 'not-allowed' : 'pointer'
-                        }}
-                    >
-                        {deleting ? 'Deleting...' : 'Yes, delete my account'}
-                    </button>
-                </div>
-            </div>
-        )}
+        <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className={styles.btnDanger}
+        >
+            <Trash2 size={18} />
+            Delete Account
+        </button>
+
+        <ConfirmModal
+            isOpen={showDeleteConfirm}
+            title="Delete your account"
+            message="This is permanent. All your data will be erased and cannot be recovered."
+            consequences={[
+              'Permanently delete all your tasks and notes',
+              'Remove you from all teams',
+              'Transfer ownership if you own any teams',
+            ]}
+            confirmPhrase="delete my account"
+            confirmText="Delete my account"
+            variant="destructive"
+            loading={deleting}
+            onConfirm={handleDeleteAccount}
+            onCancel={() => setShowDeleteConfirm(false)}
+        />
         </div>
     </div>
   )

@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabaseClient'
 import { Footer } from '@/components/dashboard-v2/Footer'
 import styles from '@/app/dashboard/dashboard.module.css'
 import { TaskActionModal } from '@/components/dashboard-v2/TaskActionModal'
-import { ConfirmDialog } from '@/components/dashboard-v2/ConfirmDialog'
+import ConfirmModal from '@/components/dashboard-v2/ConfirmModal'
 import { CustomDropdown } from '@/components/dashboard-v2/CustomDropdown'
 import { useRealtimeTasks } from '@/hooks/useRealtimeTasks'
 import { SortableTaskItem } from '@/components/dashboard-v2/SortableTaskItem'
@@ -249,20 +249,19 @@ function TasksPageContent() {
         )}
       </AnimatePresence>
 
-      {taskToDelete && (
-          <ConfirmDialog
-            isOpen={!!taskToDelete}
-            title="Delete Task"
-            message="Are you sure you want to delete this task? This action cannot be undone."
-            confirmLabel="Delete"
-            cancelLabel="Cancel"
-            onConfirm={async () => {
-                await handleDelete(taskToDelete)
-                setTaskToDelete(null)
-            }}
-            onCancel={() => setTaskToDelete(null)}
-          />
-      )}
+      <ConfirmModal
+        isOpen={!!taskToDelete}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={async () => {
+          if (taskToDelete) await handleDelete(taskToDelete)
+          setTaskToDelete(null)
+        }}
+        onCancel={() => setTaskToDelete(null)}
+      />
 
       <Footer />
     </>

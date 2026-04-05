@@ -54,6 +54,8 @@ export function Sidebar() {
   const { theme, setTheme } = useTheme()
   const [userName, setUserName] = useState('')
   const [userEmail, setUserEmail] = useState('')
+  const [userAvatar, setUserAvatar] = useState('')
+  const [userId, setUserId] = useState('')
   const [favourites, setFavourites] = useState<Favourite[]>(() => {
     if (typeof window === 'undefined') return []
     try {
@@ -67,12 +69,42 @@ export function Sidebar() {
   const [newFavHref, setNewFavHref] = useState('/dashboard')
 
   useEffect(() => {
-    void supabase.auth.getSession().then(({ data: { session } }) => {
-      const name = session?.user?.user_metadata?.name as string | undefined
-      setUserName(name ?? session?.user?.email?.split('@')[0] ?? 'User')
-      setUserEmail(session?.user?.email ?? '')
-    })
-  }, [supabase])
+    let channel: ReturnType<typeof supabase.channel> | null = null
+
+    const loadProfile = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      const uid = session.user.id
+      setUserId(uid)
+      setUserEmail(session.user.email ?? '')
+
+      const { data: profile } = await supabase
+        .from('Profile')
+        .select('name, avatar')
+        .eq('userId', uid)
+        .single()
+
+      setUserName(profile?.name || session.user.email?.split('@')[0] || 'User')
+      setUserAvatar(profile?.avatar || '')
+
+      // Subscribe to Profile changes so sidebar updates immediately after settings save
+      channel = supabase
+        .channel('sidebar-profile')
+        .on('postgres_changes', {
+          event: '*', schema: 'public', table: 'Profile',
+          filter: `userId=eq.${uid}`,
+        }, (payload) => {
+          const updated = payload.new as { name?: string; avatar?: string }
+          if (updated.name !== undefined) setUserName(updated.name || '')
+          if (updated.avatar !== undefined) setUserAvatar(updated.avatar || '')
+        })
+        .subscribe()
+    }
+
+    void loadProfile()
+    return () => { if (channel) void supabase.removeChannel(channel) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const saveFavourites = (favs: Favourite[]) => {
     setFavourites(favs)
@@ -114,9 +146,13 @@ export function Sidebar() {
       <div className={styles.sidebarProfile}>
         <div
           className={styles.sidebarAvatar}
-          style={{ background: getAvatarGradient(userName || 'U') }}
+          style={{ background: userAvatar ? 'transparent' : getAvatarGradient(userName || 'U'), overflow: 'hidden', position: 'relative' }}
         >
-          {getInitials(userName || 'User')}
+          {userAvatar ? (
+            <Image src={userAvatar} alt={userName} fill style={{ objectFit: 'cover' }} />
+          ) : (
+            getInitials(userName || 'User')
+          )}
         </div>
         <div className={styles.sidebarUserInfo}>
           <span className={styles.sidebarUserName}>{userName}</span>
