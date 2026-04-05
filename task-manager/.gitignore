@@ -63,3 +63,5 @@ _agents/
 # Supabase Local Data
 supabase/.temp/
 supabase/.branch/
+
+components/dashboard-v3/

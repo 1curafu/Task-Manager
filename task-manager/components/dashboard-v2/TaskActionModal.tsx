@@ -6,7 +6,7 @@ import styles from './TaskActionModal.module.css'
 import { X, Calendar, Tag, Flag, TextT as Type, User, Users, Plus, CheckCircle, CaretDown } from '@phosphor-icons/react'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ConfirmDialog } from './ConfirmDialog'
+import ConfirmModal from './ConfirmModal'
 import { LabelSelector, Label } from './LabelSelector'
 import { Task as BaseTask, TaskPriority } from '@/types/task'
 
@@ -679,22 +679,21 @@ export function TaskActionModal({ task, templateTask, userId, onClose, onSave }:
         </div>
       </motion.div>
 
-      {showDeleteConfirm && (
-        <ConfirmDialog
-          isOpen={showDeleteConfirm}
-          title="Delete Task"
-          message="Are you sure you want to delete this task?"
-          confirmLabel="Delete"
-          cancelLabel="Cancel"
-          onConfirm={async () => {
-            if (task) {
-              await supabase.from('Task').delete().eq('id', task.id)
-              onSave()
-            }
-          }}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      )}
+      <ConfirmModal
+        isOpen={showDeleteConfirm}
+        title="Delete Task"
+        message="Are you sure you want to delete this task?"
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={async () => {
+          if (task) {
+            await supabase.from('Task').delete().eq('id', task.id)
+            onSave()
+          }
+        }}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </motion.div>
   )
 }

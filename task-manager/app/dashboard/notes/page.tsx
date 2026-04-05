@@ -11,6 +11,7 @@ import { formatDistanceToNow, parseISO } from 'date-fns'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { PageSkeleton } from '@/components/dashboard-v2/PageSkeleton'
+import ConfirmModal from '@/components/dashboard-v2/ConfirmModal'
 interface Note {
   id: string
   content: string
@@ -365,25 +366,15 @@ export default function NotesPage() {
                 </button>
               </div>
 
-              {/* Delete Confirmation */}
-              {confirmDelete && (
-                <div className={styles.notesConfirmOverlay}>
-                  <div className={styles.notesConfirmDialog}>
-                    <h4 className={styles.notesConfirmTitle}>Delete Note</h4>
-                    <p className={styles.notesConfirmText}>
-                      Are you sure you want to delete this note? This cannot be undone.
-                    </p>
-                    <div className={styles.notesConfirmActions}>
-                      <button className={styles.notesConfirmCancel} onClick={() => setConfirmDelete(false)}>
-                        Cancel
-                      </button>
-                      <button className={styles.notesConfirmDelete} onClick={handleDeleteNote}>
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <ConfirmModal
+                isOpen={confirmDelete}
+                title="Delete Note"
+                message="Are you sure you want to delete this note? This cannot be undone."
+                confirmText="Delete"
+                variant="danger"
+                onConfirm={handleDeleteNote}
+                onCancel={() => setConfirmDelete(false)}
+              />
             </>
           ) : (
             <div className={styles.notesEditorEmpty}>

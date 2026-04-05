@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabaseClient'
 import { Task, TaskStatus, normalizeStatus } from '@/types/task'
 import { Label } from '@/components/dashboard-v2/LabelSelector'
 import { SortableTaskItem } from './SortableTaskItem'
-import { ConfirmDialog } from './ConfirmDialog'
+import ConfirmModal from './ConfirmModal'
 import { AnimatePresence } from 'framer-motion'
 import {
   DndContext,
@@ -382,13 +382,13 @@ export function KanbanBoard({ tasks: initialTasks, onTaskUpdate, userId }: Kanba
 
       <AnimatePresence>
         {taskToDelete && (
-          <ConfirmDialog
+          <ConfirmModal
             isOpen={true}
             title="Delete Task"
             message="Are you sure you want to delete this task? This cannot be undone."
-            confirmLabel="Delete"
-            cancelLabel="Cancel"
-            isDestructive
+            confirmText="Delete"
+            cancelText="Cancel"
+            variant="danger"
             onConfirm={async () => {
               await handleDeleteTask(taskToDelete)
               setTaskToDelete(null)
