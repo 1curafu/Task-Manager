@@ -2335,8 +2335,6 @@
     font-size: 0.875rem;
 }
 
-/* ─── Editor Panel ─── */
-
 .notesEditorPanel {
     flex: 1;
     background: var(--color-white);
@@ -2370,7 +2368,6 @@
     color: var(--color-slate-400);
 }
 
-/* ─── Toolbar ─── */
 
 .notesToolbar {
     display: flex;
@@ -2403,9 +2400,6 @@
 }
 
 
-
-
-
 .notesToolbarDivider {
     width: 1px;
     height: 1.25rem;
@@ -2413,9 +2407,6 @@
     margin: 0 0.375rem;
 }
 
-
-
-/* ─── Textarea ─── */
 
 .notesTextarea {
     flex: 1;
@@ -2436,8 +2427,6 @@
     color: var(--color-slate-400);
 }
 
-/* ─── Bottom Actions ─── */
-
 .notesEditorActions {
     display: flex;
     gap: 0.75rem;
@@ -2445,8 +2434,6 @@
     border-top: 1px solid var(--color-slate-200);
     background: var(--color-slate-50);
 }
-
-
 
 .notesSaveBtn {
     display: flex;
@@ -2492,7 +2479,6 @@
     color: #dc2626;
 }
 
-/* ─── Markdown Preview Styles ─── */
 .markdownPreview {
     flex: 1;
     padding: 1.5rem;
@@ -2570,8 +2556,6 @@
     padding: 0;
 }
 
-/* ─── Empty Editor State ─── */
-
 .notesEditorEmpty {
     display: flex;
     flex-direction: column;
@@ -2604,7 +2588,6 @@
 }
 
 
-/* ─── Responsive ─── */
 @media (max-width: 768px) {
     .notesPageLayout {
         flex-direction: column;
@@ -2616,7 +2599,6 @@
     }
 }
 
-/* ─── Drawer Action Buttons ─── */
 .drawerDangerBtn {
     flex: 1;
     padding: 0.75rem;
@@ -2659,7 +2641,6 @@
     background: var(--color-slate-50);
 }
 
-/* ── Shortcut Cheat Sheet ─────────────────────────────── */
 .shortcutPanel {
   position: fixed;
   bottom: 24px;
@@ -2717,13 +2698,13 @@
   line-height: 1.4;
 }
 
-/* ─── Sidebar v2 ─── */
 .sidebarProfile {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 16px 16px 12px;
 }
+
 .sidebarAvatar {
   width: 36px;
   height: 36px;
@@ -2736,11 +2717,13 @@
   color: #fff;
   flex-shrink: 0;
 }
+
 .sidebarUserInfo {
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
+
 .sidebarUserName {
   font-size: 13px;
   font-weight: 600;
@@ -2749,6 +2732,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .sidebarUserEmail {
   font-size: 11px;
   color: var(--text-tertiary);
@@ -2756,6 +2740,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .sidebarCreateBtn {
   display: flex;
   align-items: center;
@@ -2771,11 +2756,13 @@
   cursor: pointer;
   transition: opacity 0.15s;
 }
+
 .sidebarCreateBtn:hover { opacity: 0.88; }
 .sidebarNav {
   display: flex;
   flex-direction: column;
 }
+
 .sidebarNavLabel {
   font-size: 10px;
   font-weight: 700;
@@ -2797,33 +2784,39 @@
   text-decoration: none;
   transition: background 0.15s, color 0.15s;
 }
+
 .sidebarLink:hover {
   background: var(--surface);
   color: var(--text-primary);
 }
+
 .sidebarLinkActive {
   background: var(--surface);
   color: var(--primary-color);
   font-weight: 600;
 }
+
 .sidebarFavHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-right: 12px;
 }
+
 .sidebarFavItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-right: 8px;
 }
+
 .sidebarFavForm {
   padding: 6px 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
+
 .sidebarFavInput {
   width: 100%;
   padding: 6px 8px;
@@ -2834,6 +2827,7 @@
   font-size: 12px;
   box-sizing: border-box;
 }
+
 .sidebarIconBtn {
   background: none;
   border: none;
@@ -2844,16 +2838,18 @@
   display: flex;
   align-items: center;
 }
+
 .sidebarIconBtn:hover { color: var(--text-primary); }
 .sidebarBottom {
   margin-top: auto;
   padding: 8px 0 12px;
   border-top: 1px solid var(--border);
 }
+
 .sidebarLogout { color: #ff453a !important; }
+
 .sidebarLogout:hover { background: rgba(255, 69, 58, 0.08) !important; }
 
-/* ─── Kanban card v2 (Synchro layout) ─── */
 .kanbanCard {
   background: var(--card-background);
   border-radius: 12px;
@@ -2866,10 +2862,12 @@
   flex-direction: column;
   gap: 0.375rem;
 }
+
 .kanbanCard:hover {
   box-shadow: 0 4px 16px rgba(0,0,0,0.1);
   transform: translateY(-1px);
 }
+
 .kanbanCardName {
   font-size: 13px;
   font-weight: 600;
@@ -2877,6 +2875,7 @@
   margin: 4px 0 6px;
   line-height: 1.4;
 }
+
 .kanbanCardDesc {
   font-size: 12px;
   color: var(--text-secondary);
@@ -2885,12 +2884,14 @@
   text-overflow: ellipsis;
   margin-bottom: 8px;
 }
+
 .kanbanPriorityTag {
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
 .kanbanProgressBar {
   height: 3px;
   background: var(--border);
@@ -2898,20 +2899,24 @@
   overflow: hidden;
   margin-bottom: 10px;
 }
+
 .kanbanProgressFill {
   height: 100%;
   background: var(--primary-color);
   border-radius: 2px;
   transition: width 0.3s;
 }
+
 .kanbanCardFooter {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 .kanbanAvatarStack {
   display: flex;
 }
+
 .kanbanAvatar {
   width: 22px;
   height: 22px;
@@ -2926,12 +2931,14 @@
   border: 2px solid var(--card-background);
   margin-left: -4px;
 }
+
 .kanbanAvatar:first-child { margin-left: 0; }
 .kanbanCardMeta {
   display: flex;
   align-items: center;
   gap: 8px;
 }
+
 .kanbanMetaItem {
   display: flex;
   align-items: center;
@@ -2940,9 +2947,13 @@
   color: var(--text-tertiary);
 }
 
+
 .ganttToggleRow { display: flex; align-items: center; margin-bottom: 8px; }
+
 .ganttToggleBtn { background: none; border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; cursor: pointer; color: var(--text-secondary); font-size: 12px; }
+
 .ganttToggleBtn:hover { background: var(--surface); }
+
 .ganttContainer { margin-bottom: 20px; }
 
 .kanbanDateRow {
@@ -2963,7 +2974,6 @@
   margin-top: -0.125rem;
 }
 
-/* ── Task Calendar card ─────────────────────────────────── */
 .taskCalendarCard {
   background: var(--card-background);
   border-radius: var(--radius-md);
@@ -2986,7 +2996,6 @@
   color: var(--text-primary);
 }
 
-/* ── All Task card ──────────────────────────────────────── */
 .allTaskCard {
   background: var(--card-background);
   border-radius: var(--radius-md);
@@ -3009,7 +3018,6 @@
   color: var(--text-primary);
 }
 
-/* ── View switcher ──────────────────────────────────────── */
 .viewSwitcher {
   display: flex;
   align-items: center;
@@ -3030,6 +3038,7 @@
   transition: background 0.15s, color 0.15s;
   font-weight: 400;
 }
+
 .viewBtn:hover { color: var(--text-primary); }
 
 .viewBtnActive {
@@ -3037,4 +3046,178 @@
   color: var(--text-primary);
   font-weight: 500;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+
+.mobileNavSpacer {
+  display: none;
+  height: 80px;
+}
+
+@media (max-width: 767px) {
+  .mobileNavSpacer {
+    display: block;
+  }
+
+  .content {
+    padding: 1rem 1rem 0;
+    height: auto;
+    min-height: 100dvh;
+    overflow-y: auto;
+  }
+
+  .header {
+    margin-bottom: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--background);
+    padding: 10px 0 10px;
+    border-bottom: 1px solid var(--border);
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .breadcrumbRoot {
+    display: none;
+  }
+  .breadcrumbSep {
+    display: none;
+  }
+  .breadcrumbPage {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .statPillsContainer {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .statPill {
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+  }
+
+  .statPill strong {
+    font-size: 1rem;
+  }
+
+  .dashboardBottomLayout {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .pageTitle {
+    font-size: 1.25rem;
+  }
+
+  .pageHeaderContainerFlex {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .sortContainer {
+    width: 100%;
+  }
+
+  .filterPills {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .filterPills::-webkit-scrollbar { display: none; }
+
+  .filterPill {
+    flex-shrink: 0;
+    font-size: 0.8rem;
+    padding: 0.35rem 0.875rem;
+  }
+
+  .taskListItem {
+    padding: 0.875rem 1rem;
+  }
+
+  .analyticsStatGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analyticsMainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .weeklyProgressBody {
+    gap: 1.25rem;
+  }
+
+  .notesPageLayout {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .notesListPanel {
+    width: 100%;
+    min-width: unset;
+    max-height: 260px;
+  }
+
+  .settingsContainer {
+    max-width: 100%;
+  }
+
+  .settingsThemeGrid {
+    flex-direction: column;
+  }
+
+  .pageContentGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .modalContent {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 24px 24px 0 0;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 92dvh;
+    overflow-y: auto;
+    padding: 24px 20px 32px;
+  }
+
+  .searchBox {
+    width: 180px;
+  }
+
+  .searchResultsDropdown {
+    width: 280px;
+    right: -60px;
+  }
+
+  .shortcutPanel {
+    display: none;
+  }
+}
+
+@media (max-width: 380px) {
+  .statPillsContainer {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .statPill {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .searchBox {
+    width: 140px;
+  }
 }
