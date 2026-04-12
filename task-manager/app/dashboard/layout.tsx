@@ -8,6 +8,7 @@ import { Toaster } from 'sonner'
 import styles from './dashboard.module.css'
 import { Sidebar } from '@/components/dashboard-v2/Sidebar'
 import { Header, TemplateTask } from '@/components/dashboard-v2/Header'
+import { MobileNav } from '@/components/dashboard-v2/MobileNav'
 import { PageSkeleton } from '@/components/dashboard-v2/PageSkeleton'
 
 import { TaskActionModal } from '@/components/dashboard-v2/TaskActionModal'
@@ -167,9 +168,12 @@ export default function DashboardLayout({
              focusSearchRef={focusSearchRef}
           />
           {children}
+          <div className={styles.mobileNavSpacer} />
         </main>
       </div>
-      
+
+      <MobileNav />
+
       <AnimatePresence>
         {userProfile && userProfile.hasCompletedOnboarding === false && (
           <OnboardingModal
